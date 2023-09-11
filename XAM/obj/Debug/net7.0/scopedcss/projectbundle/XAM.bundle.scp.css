@@ -8,6 +8,12 @@ a.navbar-brand[b-gp3yvk6gei] {
   word-break: break-all;
 }
 
+/* Set a max-width for the logo without a class */
+a.navbar-brand img[b-gp3yvk6gei] {
+  max-width: 10%;
+  height: auto;
+}
+
 a[b-gp3yvk6gei] {
   color: #0077cc;
 }

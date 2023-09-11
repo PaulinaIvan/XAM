@@ -8,30 +8,24 @@
     "net7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\pauly\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\ezers\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\pauly\\Documents\\GitHub\\XAM\\XAM\\XAM.csproj",
+      "projectUniqueName": "c:\\Users\\ezers\\GitRep\\XAM-1\\XAM\\XAM.csproj",
       "projectName": "XAM",
-      "projectPath": "c:\\Users\\pauly\\Documents\\GitHub\\XAM\\XAM\\XAM.csproj",
-      "packagesPath": "C:\\Users\\pauly\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\pauly\\Documents\\GitHub\\XAM\\XAM\\obj\\",
+      "projectPath": "c:\\Users\\ezers\\GitRep\\XAM-1\\XAM\\XAM.csproj",
+      "packagesPath": "C:\\Users\\ezers\\.nuget\\packages\\",
+      "outputPath": "c:\\Users\\ezers\\GitRep\\XAM-1\\XAM\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\pauly\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\ezers\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

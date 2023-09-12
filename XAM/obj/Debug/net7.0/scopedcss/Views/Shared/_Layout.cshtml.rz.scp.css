@@ -9,8 +9,8 @@ a.navbar-brand[b-gp3yvk6gei] {
 
 /* Set a max-width for the logo without a class */
 a.navbar-brand img[b-gp3yvk6gei] {
-  max-width: 10%;
-  height: auto;
+  width: 60px;
+  height: 60px;
 }
 
 a[b-gp3yvk6gei] {

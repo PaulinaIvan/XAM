@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\ezers\\GitRep\\XAM-1\\XAM\\XAM.csproj",
+      "projectUniqueName": "c:\\Users\\ezers\\GitRep\\XAM\\XAM\\XAM.csproj",
       "projectName": "XAM",
-      "projectPath": "c:\\Users\\ezers\\GitRep\\XAM-1\\XAM\\XAM.csproj",
+      "projectPath": "c:\\Users\\ezers\\GitRep\\XAM\\XAM\\XAM.csproj",
       "packagesPath": "C:\\Users\\ezers\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\ezers\\GitRep\\XAM-1\\XAM\\obj\\",
+      "outputPath": "c:\\Users\\ezers\\GitRep\\XAM\\XAM\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ezers\\AppData\\Roaming\\NuGet\\NuGet.Config"

@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Get ready!";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>This is where you prepare :0</p>
+
+<style> 
+
+.dropbtn {
+  background-color: rgb(20, 33, 61);
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: rgb(252, 163, 17);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: rgb(17, 28, 52);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: rgb(222, 143, 15);
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: rgb(17, 28, 52);
+}
+</style>
+
+<div class="dropdown">
+  <button class="dropbtn">Exams</button>
+  <div class="dropdown-content">
+    <a href="#">Biology</a>
+    <a href="#">Economics</a>
+    <a href="#">Math</a>
+  </div>
+</div>

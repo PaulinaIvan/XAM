@@ -20,6 +20,9 @@ public class HomeController : Controller
 
     public IActionResult Preparation()
     {
+        DateTime DT = new DateTime(2015, 12, 20);
+        Exam bio = new Exam("bioogijoa", DT);
+        Console.WriteLine(bio.Name);
         return View();
     }
 

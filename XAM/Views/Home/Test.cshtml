@@ -1,0 +1,162 @@
+@{
+    ViewData["Title"] = "FlashcardsAndExamsTest";
+}
+<h1>@ViewData["Title"]</h1>
+
+<style>
+    .flashcard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-gap: 10px;
+        padding: 20px;
+    }
+    .exam-box {
+        border: 5px solid #baba71;
+        border-radius: 6px;
+        padding: 10px;
+        background-color: #e1e1b1;
+        text-align: center;
+    }
+    .box {
+        width: 100%;
+        height: 100px;
+        background-color: #00000000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+        perspective: 1000px;
+    }
+    .box-inner {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        transform-style: preserve-3d;
+        transition: transform 0.4s;
+    }
+    .box-front, .box-back {
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        backface-visibility: hidden;
+    }
+    .box-front {
+        background-color: #3fc24e;
+        border: 5px solid #2b8335;
+    }
+    .box-back {
+        background-color: #c9aa46;
+        border: 5px solid #9a8337;
+        transform: rotateY(180deg);
+    }
+</style>
+<div>
+    <input type="text" id="examName" placeholder="Exam name">
+    <input type="date" id="examDate">
+    <button onclick="createExam()">Add Exam</button>
+</div>
+<div id="exam-grid"></div>
+
+<script>
+    function createExam()
+    {
+        const examNameValue = document.getElementById('examName').value;
+        const examDateValue = document.getElementById('examDate').value;
+
+        fetch(`/Home/CreateExam?name=${examNameValue}&date=${examDateValue}`)
+            .then(response => response.json())
+            .then(data => {
+                addExam(data.name, data.date);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        document.getElementById('examName').value = '';
+        document.getElementById('examDate').value = '';
+    }
+
+    function addExam(examNameValue, dateNameValue)
+    {
+        const examGrid = document.getElementById('exam-grid');
+
+        const cardControls = document.createElement('div');
+        
+        const frontTextInput = document.createElement('input');
+        frontTextInput.setAttribute('placeholder', 'Question');
+        cardControls.appendChild(frontTextInput);
+
+        const backTextInput = document.createElement('input');
+        backTextInput.setAttribute('placeholder', 'Answer');
+        cardControls.appendChild(backTextInput);
+
+        const createFlashcardButton = document.createElement('button');
+        createFlashcardButton.innerHTML = "Add Flashcard";
+        cardControls.appendChild(createFlashcardButton);
+
+        const flashcardGrid = document.createElement('div');
+        flashcardGrid.classList.add('flashcard-grid');
+
+        const examBox = document.createElement('div');
+        examBox.classList.add("exam-box");
+        examBox.textContent = `${examNameValue} - ${dateNameValue}`;
+        examBox.appendChild(cardControls);
+
+        createFlashcardButton.onclick = function() {
+			createFlashcard(frontTextInput, backTextInput, examNameValue);
+		};
+
+        examBox.appendChild(cardControls);
+        examBox.appendChild(flashcardGrid);
+        examGrid.appendChild(examBox);
+        flashcardGrid.setAttribute('id', `${examNameValue}Grid`);
+    }
+
+    function createFlashcard(frontTextInput, backTextInput, examNameValue)
+    {
+        fetch(`/Home/CreateFlashcard?frontText=${frontTextInput.value}&backText=${backTextInput.value}&examName=${examNameValue}`)
+            .then(response => response.json())
+            .then(data => {
+                addFlashcard(data.frontText, data.backText, data.examName);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        frontTextInput.value = '';
+        backTextInput.value = '';
+    }
+
+    function addFlashcard(frontTextValue, backTextValue, examNameValue)
+    {
+        const box = document.createElement('div');
+        box.classList.add('box');
+
+        const boxInner = document.createElement('div');
+        boxInner.classList.add('box-inner');
+
+        const boxFront = document.createElement('div');
+        boxFront.classList.add('box-front');
+        boxFront.textContent = frontTextValue;
+
+        const boxBack = document.createElement('div');
+        boxBack.classList.add('box-back');
+        boxBack.textContent = backTextValue;
+
+        box.addEventListener('click', () => {
+            boxInner.style.transform = (boxInner.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)');
+        });
+
+        boxInner.appendChild(boxFront);
+        boxInner.appendChild(boxBack);
+        box.appendChild(boxInner);
+        document.getElementById(`${examNameValue}Grid`).appendChild(box);
+    }
+</script>

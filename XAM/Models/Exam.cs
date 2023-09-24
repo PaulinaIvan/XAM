@@ -2,24 +2,24 @@ public class Exam
 {
     public string Name { get; set; }
     public DateTime Date { get; set; }
-    public List<Flashcards> Flashcards { get; set; } // List of flashcards
+    public List<Flashcard> Flashcards { get; set; } // List of flashcards
 
     public Exam(string name, DateTime date)
     {
         Name = name;
         Date = date;
-        Flashcards = new List<Flashcards>(); // Initialize the list of flashcards
+        Flashcards = new List<Flashcard>(); // Initialize the list of flashcards
     }
 }
 
-public struct Flashcards
+public struct Flashcard
 {
-    public string Question { get; set; }
-    public string Answer { get; set; }
+    public string FrontText { get; set; }
+    public string BackText { get; set; }
 
-    public Flashcards(string question, string answer)
+    public Flashcard(string frontText, string backText)
     {
-        Question = question;
-        Answer = answer;
+        FrontText = frontText;
+        BackText = backText;
     }
 }

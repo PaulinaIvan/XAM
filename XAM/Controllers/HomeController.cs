@@ -21,10 +21,10 @@ public class HomeController : Controller
 
     public IActionResult Preparation()
     {
-        //Exam class testing, try it out
-        DateTime DT = new DateTime(2015, 12, 20);
-        Exam bio = new Exam("BIOLOGIJA", DT);
-        Console.WriteLine(bio.Name);
+        // Exam class testing, try it out
+        // DateTime DT = new DateTime(2015, 12, 20);
+        // Exam bio = new Exam("BIOLOGIJA", DT);
+        // Console.WriteLine(bio.Name);
 
         return View();
     }

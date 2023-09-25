@@ -60,7 +60,10 @@
 <div>
     <input type="text" id="examName" placeholder="Exam name">
     <input type="date" id="examDate">
-    <button onclick="createExam()">Add Exam</button>
+    <button onclick="createExam()">Add exam</button>
+    <button id="downloadButton">Download exams</button>
+    <input type="file" id="fileInput">
+    <button id="uploadButton">Upload file</button>
 </div>
 <div id="exam-grid"></div>
 
@@ -70,14 +73,27 @@
         const examNameValue = document.getElementById('examName').value;
         const examDateValue = document.getElementById('examDate').value;
 
-        fetch(`/Home/CreateExam?name=${examNameValue}&date=${examDateValue}`)
-            .then(response => response.json())
-            .then(data => {
-                addExam(data.name, data.date);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        if(examNameValue === '' || examDateValue === '')
+        {
+            alert("Please enter details!");
+            return;
+        }
+
+        if(!document.getElementById(`${examNameValue}Grid`))
+        {
+            fetch(`/Home/CreateExam?name=${examNameValue}&date=${examDateValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    addExam(data.name, data.date);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        else
+        {
+            alert("Exam name already exists!");
+        }
 
         document.getElementById('examName').value = '';
         document.getElementById('examDate').value = '';
@@ -159,4 +175,61 @@
         box.appendChild(boxInner);
         document.getElementById(`${examNameValue}Grid`).appendChild(box);
     }
+
+    // Download
+    document.getElementById('downloadButton').addEventListener('click', function() {
+        fetch('/Home/GetAllExams')
+        .then(response => response.json())
+        .then(exams => {
+            saveExamsToFile(exams);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    function saveExamsToFile(exams)
+    {
+        const jsonContent = JSON.stringify(exams);
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'custom_scripts.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // Upload
+    document.getElementById('uploadButton').addEventListener('click', function() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/Home/UploadExamFile', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.list && Array.isArray(data.list)) {
+
+                    data.list.forEach(exam => {
+                        addExam(exam.name, exam.date);
+                        exam.flashcards.forEach(flashcard => {
+                            addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                        });
+                    });
+                } else {
+                    console.error('Invalid data format received from the server.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            alert('Please select a file to upload.');
+        }
+    });
+
 </script>

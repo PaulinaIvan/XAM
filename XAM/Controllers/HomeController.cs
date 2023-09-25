@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using XAM.Models;
 
@@ -7,11 +8,12 @@ namespace XAM.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private List<Exam> Exams = new();
+    private readonly ExamDataSingleton _dataHolder;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, ExamDataSingleton dataHolder)
     {
         _logger = logger;
+        _dataHolder = dataHolder;
     }
 
     public IActionResult Index()
@@ -41,30 +43,33 @@ public class HomeController : Controller
 
     public IActionResult CreateExam(string name, string date)
     {
+        DateTime parsedDate;
         try
         {
-            Exam newExam = new(name, DateTime.Parse(date));
-            Exams.Add(newExam);
-
-            var result = new
-            {
-                Name = name,
-                Date = date,
-            };
-            return Json(result);
+            parsedDate = DateTime.Parse(date);
         }
         catch
         {
             Console.WriteLine("Error.");
-            return Json(null);
+            return BadRequest("Error.");
         }
+        Exam newExam = new(name, parsedDate);
+
+        _dataHolder.Exams.Add(newExam);
+
+        var result = new
+        {
+            Name = newExam.Name,
+            Date = newExam.Date.ToString("yyyy-MM-dd"),
+        };
+        return Json(result);
     }
 
     public IActionResult CreateFlashcard(string frontText, string backText, string examName)
     {
         try
         {
-            Exams.Find(exam => exam.Name == examName)?.Flashcards.Add(new Flashcard(frontText, backText));
+            _dataHolder.Exams.Find(exam => exam.Name == examName)?.Flashcards.Add(new Flashcard(frontText, backText));
             var result = new
             {
                 FrontText = frontText,
@@ -76,7 +81,52 @@ public class HomeController : Controller
         catch
         {
             Console.WriteLine("Error.");
-            return Json(null);
+            return BadRequest("Error.");
+        }
+    }
+
+    public IActionResult GetAllExams()
+    {
+        if(_dataHolder.Exams.Count > 0)
+            return Json(_dataHolder.Exams);
+        else
+            return BadRequest("Zero exams present.");
+    }
+
+    public IActionResult UploadExamFile(IFormFile file)
+    {
+        if (file != null && file.Length > 0)
+        {
+            try
+            {
+                using var reader = new StreamReader(file.OpenReadStream());
+                var fileContent = reader.ReadToEnd();
+                List<Exam>? examsFromFile = JsonSerializer.Deserialize<List<Exam>>(fileContent,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true,
+                        });
+                List<Exam> uniqueExams = new();
+                if(examsFromFile != null)
+                    foreach(Exam examFromFile in examsFromFile)
+                    {
+                        if(_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
+                            uniqueExams.Add(examFromFile);
+                    }
+
+                if(examsFromFile != null)
+                    _dataHolder.Exams.AddRange(uniqueExams);
+
+                return Json(new { message = "File uploaded and parsed successfully.", list = uniqueExams });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing the file.", error = ex.Message });
+            }
+        }
+        else
+        {
+            return BadRequest(new { message = "No file was selected for upload." });
         }
     }
 

@@ -96,10 +96,7 @@ public class HomeController : Controller
 
     public IActionResult GetAllExams()
     {
-        if(_dataHolder.Exams.Count > 0)
-            return Json(_dataHolder.Exams);
-        else
-            return BadRequest("Zero exams present.");
+        return Json(_dataHolder.Exams);
     }
 
     public IActionResult UploadExamFile(IFormFile file)

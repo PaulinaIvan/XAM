@@ -77,7 +77,7 @@
     fetch(`/Home/FetchExams`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data && Array.isArray(data))
+                    if (data && Array.isArray(data) && data.length > 0)
                     {
                         data.forEach(exam => {
                             addExam(exam.name, exam.date.substring(0, 10));
@@ -230,7 +230,14 @@
         fetch('/Home/GetAllExams')
         .then(response => response.json())
         .then(exams => {
-            saveExamsToFile(exams);
+            if(exams && Array.isArray(exams) && exams.length > 0)
+            {
+                saveExamsToFile(exams);
+            }
+            else
+            {
+                alert("Nothing to download.")
+            }
         })
         .catch(error => console.error('Error:', error));
     });

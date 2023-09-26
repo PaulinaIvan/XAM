@@ -1,145 +1,294 @@
-﻿@{
-  ViewData["Title"] = "Get ready!";
+@{
+    ViewData["Title"] = "Preparation";
 }
 <h1>@ViewData["Title"]</h1>
 
-
 <style>
-  .dropbtn {
-    background-color: rgb(20, 33, 61);
-    color: white;
-    padding: 16px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-  }
-
-  .dropdown {
-    position: relative;
-    display: inline-block;
-  }
-
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: rgb(252, 163, 17);
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-  }
-
-  .dropdown-content a {
-    color: rgb(17, 28, 52);
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-  }
-
-  .dropdown-content a:hover {
-    background-color: rgb(222, 143, 15);
-  }
-
-  .dropdown:hover .dropdown-content {
-    display: block;
-  }
-
-  .dropdown:hover .dropbtn {
-    background-color: rgb(17, 28, 52);
-  }
-
-  #below-buttons {
-    margin-top: 20px;
-    /* Add some space between buttons and content */
-    padding: 20px;
-    background-color: white;
-    /* Default background color */
-  }
+    .flashcard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-gap: 10px;
+        padding: 20px;
+    }
+    .exam-box {
+        border: 5px solid #baba71;
+        border-radius: 6px;
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #e1e1b1;
+        text-align: center;
+    }
+    .box {
+        width: 100%;
+        height: 100px;
+        background-color: #00000000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+        perspective: 1000px;
+    }
+    .box-inner {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        transform-style: preserve-3d;
+        transition: transform 0.4s;
+    }
+    .box-front, .box-back {
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        backface-visibility: hidden;
+    }
+    .box-front {
+        background-color: #3fc24e;
+        border: 5px solid #2b8335;
+    }
+    .box-back {
+        background-color: #c9aa46;
+        border: 5px solid #9a8337;
+        transform: rotateY(180deg);
+    }
 </style>
 
-<div class="dropdown">
-  <button class="dropbtn">Exams</button>
-  <div class="dropdown-content" id="examList">
-    <!-- 
-    <a href="#" data-color="green">Biology</a>
-    <a href="#" data-color="red">Math</a>
-    <a href="#" data-color="blue">Economics</a>
-     -->
-    <!-- The user creates his own exams -->
-  </div>
+<div style="display: grid; grid-template-columns: 9fr 7fr;">
+    <div>
+    <input type="text" id="examName" placeholder="Exam name">
+    <input type="date" id="examDate">
+    <button onclick="createExam()">Add exam</button>
+    <button id="downloadButton">Download exams</button>
+    </div>
+    <div style="text-align: right;">
+    <button id="uploadButton">Upload file</button>
+    <input type="file" id="fileInput">
+    </div>
 </div>
-
-<!-- Add Exam Button -->
-<button class="dropbtn" onclick="addExam()">Add Exam</button>
-
-<!-- Delete Exam Button -->
-<button class="dropbtn" onclick="deleteExam()">Delete Exam</button>
-
-<!-- Display selected exam below -->
-<div id="below-buttons">
-  <div id="selectedExam" style="display: none;"></div>
-</div>
+<div id="exam-grid"></div>
 
 <script>
-  var examList = document.getElementById("examList");
-  var selectedExam = document.getElementById("selectedExam");
+    fetch(`/Home/FetchExams`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && Array.isArray(data))
+                    {
+                        data.forEach(exam => {
+                            addExam(exam.name, exam.date.substring(0, 10));
+                            exam.flashcards.forEach(flashcard => {
+                                addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                            });
+                        });
+                    }
+                    else
+                    {
+                        console.log('Invalid data format received from the server.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
 
-  // Variable to keep track of the selected exam
-  var currentSelectedExam = null;
+    function createExam()
+    {
+        const examNameValue = document.getElementById('examName').value;
+        const examDateValue = document.getElementById('examDate').value;
 
-  function addExam() {
-    var examName = prompt("Enter the name of the exam:");
-    if (examName) {
-      var newExam = document.createElement("a");
-      newExam.href = "#";
-      newExam.textContent = examName;
-      newExam.addEventListener("click", function () {
-        // Set the selected exam when clicked
-        currentSelectedExam = this;
-        displaySelectedExam(currentSelectedExam);
-      });
-      examList.appendChild(newExam);
+        if(examNameValue === '' || examDateValue === '')
+        {
+            alert("Please enter details!");
+            return;
+        }
+
+        if(!document.getElementById(`${examNameValue}Grid`))
+        {
+            fetch(`/Home/CreateExam?name=${examNameValue}&date=${examDateValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    addExam(data.name, data.date);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        else
+        {
+            alert("Exam name already exists!");
+        }
+
+        document.getElementById('examName').value = '';
+        document.getElementById('examDate').value = '';
     }
-  }
 
-  function deleteExam() {
-    if (currentSelectedExam) {
-      if (confirm("Are you sure you want to delete the selected exam?")) {
-        currentSelectedExam.remove();
-        clearSelectedExam();
-      }
+    function addExam(examNameValue, dateNameValue)
+    {
+        const examGrid = document.getElementById('exam-grid');
+
+        const cardControls = document.createElement('div');
+        
+        const frontTextInput = document.createElement('input');
+        frontTextInput.setAttribute('placeholder', 'Question');
+        cardControls.appendChild(frontTextInput);
+
+        const backTextInput = document.createElement('input');
+        backTextInput.setAttribute('placeholder', 'Answer');
+        cardControls.appendChild(backTextInput);
+
+        const createFlashcardButton = document.createElement('button');
+        createFlashcardButton.innerHTML = "Add Flashcard";
+        cardControls.appendChild(createFlashcardButton);
+
+        const deleteExamButton = document.createElement('button');
+        deleteExamButton.innerHTML = "Delete Exam";
+        cardControls.appendChild(deleteExamButton);
+
+        const flashcardGrid = document.createElement('div');
+        flashcardGrid.classList.add('flashcard-grid');
+
+        const examBox = document.createElement('div');
+        examBox.classList.add("exam-box");
+        examBox.textContent = `${examNameValue} - ${dateNameValue}`;
+        examBox.appendChild(cardControls);
+
+        createFlashcardButton.onclick = function() {
+			createFlashcard(frontTextInput, backTextInput, examNameValue);
+		};
+
+        deleteExamButton.onclick = function() {
+			deleteExam(examNameValue);
+		};
+
+        examBox.appendChild(cardControls);
+        examBox.appendChild(flashcardGrid);
+        examGrid.appendChild(examBox);
+        examBox.setAttribute('id', `${examNameValue}Id`);
+        flashcardGrid.setAttribute('id', `${examNameValue}Grid`);
     }
-  }
 
-  function getRandomColor() {
-    var letters = "0123456789ABCDEF";
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
+    function createFlashcard(frontTextInput, backTextInput, examNameValue)
+    {
+        fetch(`/Home/CreateFlashcard?frontText=${frontTextInput.value}&backText=${backTextInput.value}&examName=${examNameValue}`)
+            .then(response => response.json())
+            .then(data => {
+                addFlashcard(data.frontText, data.backText, data.examName);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        frontTextInput.value = '';
+        backTextInput.value = '';
     }
-    return color;
-  }
 
-  // Function to display the selected exam below
-  function displaySelectedExam(examElement) {
-    var selectedOption = examElement.textContent;
-    var color = getRandomColor();
-    var belowButtons = document.getElementById("below-buttons");
+    function addFlashcard(frontTextValue, backTextValue, examNameValue)
+    {
+        const box = document.createElement('div');
+        box.classList.add('box');
 
-    // Apply the selected color to the background of the area below the buttons
-    belowButtons.style.backgroundColor = color;
+        const boxInner = document.createElement('div');
+        boxInner.classList.add('box-inner');
 
-    // Update the selected exam div
-    selectedExam.textContent = "Selected Exam: " + selectedOption;
-    selectedExam.style.backgroundColor = color;
-    selectedExam.style.display = "block"; // Show the selected option
-  }
+        const boxFront = document.createElement('div');
+        boxFront.classList.add('box-front');
+        boxFront.textContent = frontTextValue;
 
-  // Function to clear the selected exam display
-  function clearSelectedExam() {
-    var belowButtons = document.getElementById("below-buttons");
-    belowButtons.style.backgroundColor = "white"; // Reset the background color
-    selectedExam.textContent = "";
-    selectedExam.style.display = "none"; // Hide the selected option
-    currentSelectedExam = null; // Clear the current selected exam
-  }
+        const boxBack = document.createElement('div');
+        boxBack.classList.add('box-back');
+        boxBack.textContent = backTextValue;
+
+        box.addEventListener('click', () => {
+            boxInner.style.transform = (boxInner.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)');
+        });
+
+        boxInner.appendChild(boxFront);
+        boxInner.appendChild(boxBack);
+        box.appendChild(boxInner);
+        document.getElementById(`${examNameValue}Grid`).appendChild(box);
+    }
+
+    function deleteExam(examNameValue)
+    {
+        const examBox = document.getElementById(`${examNameValue}Id`);
+        fetch(`/Home/DeleteExam?examName=${examNameValue}`)
+            .then(response => response.json())
+            .then(data => {
+                examBox.remove();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // Download
+    document.getElementById('downloadButton').addEventListener('click', function() {
+        fetch('/Home/GetAllExams')
+        .then(response => response.json())
+        .then(exams => {
+            saveExamsToFile(exams);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    function saveExamsToFile(exams)
+    {
+        const formattedExams = exams.map(exam => {
+            return {
+                ...exam,
+                date: exam.date.substring(0, 10)
+            };
+        });
+
+        const jsonContent = JSON.stringify(formattedExams);
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'custom_scripts.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // Upload
+    document.getElementById('uploadButton').addEventListener('click', function() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/Home/UploadExamFile', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.list && Array.isArray(data.list)) {
+
+                    data.list.forEach(exam => {
+                        addExam(exam.name, exam.date.substring(0, 10));
+                        exam.flashcards.forEach(flashcard => {
+                            addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                        });
+                    });
+                }
+                else
+                {
+                    console.error('Invalid data format received from the server.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        else
+        {
+            alert('Please select a file to upload.');
+        }
+    });
 </script>

@@ -23,11 +23,6 @@ public class HomeController : Controller
 
     public IActionResult Preparation()
     {
-        //Exam class testing, try it out
-        DateTime DT = new DateTime(2015, 12, 20);
-        Exam bio = new Exam("BIOLOGIJA", DT);
-        Console.WriteLine(bio.Name);
-
         return View();
     }
 
@@ -36,9 +31,9 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Test()
+    public IActionResult FetchExams()
     {
-        return View();
+        return Json(_dataHolder.Exams);
     }
 
     public IActionResult CreateExam(string name, string date)
@@ -63,6 +58,20 @@ public class HomeController : Controller
             Date = newExam.Date.ToString("yyyy-MM-dd"),
         };
         return Json(result);
+    }
+
+    public IActionResult DeleteExam(string examName)
+    {
+        Exam? examToDelete = _dataHolder.Exams.Find(exam => exam.Name == examName);
+        if(examToDelete != null)
+        {
+            _dataHolder.Exams.Remove(examToDelete);
+            return Json("File uploaded and parsed successfully.");
+        }
+        else
+        {
+            return BadRequest("Exam not found.");
+        }
     }
 
     public IActionResult CreateFlashcard(string frontText, string backText, string examName)

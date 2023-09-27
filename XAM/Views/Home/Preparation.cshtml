@@ -10,6 +10,7 @@
         grid-gap: 10px;
         padding: 20px;
     }
+
     .exam-box {
         border: 5px solid #baba71;
         border-radius: 6px;
@@ -18,6 +19,7 @@
         background-color: #e1e1b1;
         text-align: center;
     }
+
     .box {
         width: 100%;
         height: 100px;
@@ -30,6 +32,7 @@
         cursor: pointer;
         perspective: 1000px;
     }
+
     .box-inner {
         width: 100%;
         height: 100%;
@@ -37,7 +40,9 @@
         transform-style: preserve-3d;
         transition: transform 0.4s;
     }
-    .box-front, .box-back {
+
+    .box-front,
+    .box-back {
         width: 100%;
         height: 100%;
         padding: 10px;
@@ -48,66 +53,101 @@
         position: absolute;
         backface-visibility: hidden;
     }
+
     .box-front {
         background-color: #3fc24e;
         border: 5px solid #2b8335;
     }
+
     .box-back {
         background-color: #c9aa46;
         border: 5px solid #9a8337;
         transform: rotateY(180deg);
     }
+
+    .button-style {
+        background-color: #FFC107;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    #downloadButton {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    #browseButton {
+        background-color: #FFC107;
+        color: white;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+        padding: 10px;
+        border: 2px solid #FFC107;
+        border-radius: 4px;
+        font-size: 16px;
+    }
 </style>
 
 <div style="display: grid; grid-template-columns: 9fr 7fr;">
     <div>
-    <input type="text" id="examName" placeholder="Exam name">
-    <input type="date" id="examDate">
-    <button onclick="createExam()">Add exam</button>
-    <button id="downloadButton">Download exams</button>
+        <input type="text" id="examName" placeholder="Exam name">
+        <input type="date" id="examDate">
+        <button onclick="createExam()">Add exam</button>
+        <button id="downloadButton">Download exams</button>
     </div>
     <div style="text-align: right;">
-    <button id="uploadButton">Upload file</button>
-    <input type="file" id="fileInput">
+        <label for="fileInput" id="browseButton" class="button-style">Browse</label>
+        <input type="file" id="fileInput" style="display: none;">
     </div>
 </div>
 <div id="exam-grid"></div>
 
 <script>
     fetch(`/Home/FetchExams`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && Array.isArray(data) && data.length > 0)
-                    {
-                        data.forEach(exam => {
-                            addExam(exam.name, exam.date.substring(0, 10));
-                            exam.flashcards.forEach(flashcard => {
-                                addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
-                            });
-                        });
-                    }
-                    else
-                    {
-                        console.log('Invalid data format received from the server.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+        .then(response => response.json())
+        .then(data => {
+            if (data && Array.isArray(data) && data.length > 0) {
+                data.forEach(exam => {
+                    addExam(exam.name, exam.date.substring(0, 10));
+                    exam.flashcards.forEach(flashcard => {
+                        addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                    });
                 });
+            }
+            else {
+                console.log('Invalid data format received from the server.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 
-    function createExam()
-    {
+    function createExam() {
         const examNameValue = document.getElementById('examName').value;
         const examDateValue = document.getElementById('examDate').value;
 
-        if(examNameValue === '' || examDateValue === '')
-        {
+        if (examNameValue === '' || examDateValue === '') {
             alert("Please enter details!");
             return;
         }
 
-        if(!document.getElementById(`${examNameValue}Grid`))
-        {
+        if (!document.getElementById(`${examNameValue}Grid`)) {
             fetch(`/Home/CreateExam?name=${examNameValue}&date=${examDateValue}`)
                 .then(response => response.json())
                 .then(data => {
@@ -117,8 +157,7 @@
                     console.error('Error:', error);
                 });
         }
-        else
-        {
+        else {
             alert("Exam name already exists!");
         }
 
@@ -126,18 +165,19 @@
         document.getElementById('examDate').value = '';
     }
 
-    function addExam(examNameValue, dateNameValue)
-    {
+    function addExam(examNameValue, dateNameValue) {
         const examGrid = document.getElementById('exam-grid');
 
         const cardControls = document.createElement('div');
-        
+
         const frontTextInput = document.createElement('input');
         frontTextInput.setAttribute('placeholder', 'Question');
+        frontTextInput.setAttribute('type', 'text');
         cardControls.appendChild(frontTextInput);
 
         const backTextInput = document.createElement('input');
         backTextInput.setAttribute('placeholder', 'Answer');
+        backTextInput.setAttribute('type', 'text');
         cardControls.appendChild(backTextInput);
 
         const createFlashcardButton = document.createElement('button');
@@ -146,6 +186,7 @@
 
         const deleteExamButton = document.createElement('button');
         deleteExamButton.innerHTML = "Delete Exam";
+        deleteExamButton.style.backgroundColor = "red";
         cardControls.appendChild(deleteExamButton);
 
         const flashcardGrid = document.createElement('div');
@@ -156,13 +197,13 @@
         examBox.textContent = `${examNameValue} - ${dateNameValue}`;
         examBox.appendChild(cardControls);
 
-        createFlashcardButton.onclick = function() {
-			createFlashcard(frontTextInput, backTextInput, examNameValue);
-		};
+        createFlashcardButton.onclick = function () {
+            createFlashcard(frontTextInput, backTextInput, examNameValue);
+        };
 
-        deleteExamButton.onclick = function() {
-			deleteExam(examNameValue);
-		};
+        deleteExamButton.onclick = function () {
+            deleteExam(examNameValue);
+        };
 
         examBox.appendChild(cardControls);
         examBox.appendChild(flashcardGrid);
@@ -171,8 +212,7 @@
         flashcardGrid.setAttribute('id', `${examNameValue}Grid`);
     }
 
-    function createFlashcard(frontTextInput, backTextInput, examNameValue)
-    {
+    function createFlashcard(frontTextInput, backTextInput, examNameValue) {
         fetch(`/Home/CreateFlashcard?frontText=${frontTextInput.value}&backText=${backTextInput.value}&examName=${examNameValue}`)
             .then(response => response.json())
             .then(data => {
@@ -186,8 +226,7 @@
         backTextInput.value = '';
     }
 
-    function addFlashcard(frontTextValue, backTextValue, examNameValue)
-    {
+    function addFlashcard(frontTextValue, backTextValue, examNameValue) {
         const box = document.createElement('div');
         box.classList.add('box');
 
@@ -212,8 +251,7 @@
         document.getElementById(`${examNameValue}Grid`).appendChild(box);
     }
 
-    function deleteExam(examNameValue)
-    {
+    function deleteExam(examNameValue) {
         const examBox = document.getElementById(`${examNameValue}Id`);
         fetch(`/Home/DeleteExam?examName=${examNameValue}`)
             .then(response => response.json())
@@ -226,24 +264,21 @@
     }
 
     // Download
-    document.getElementById('downloadButton').addEventListener('click', function() {
+    document.getElementById('downloadButton').addEventListener('click', function () {
         fetch('/Home/GetAllExams')
-        .then(response => response.json())
-        .then(exams => {
-            if(exams && Array.isArray(exams) && exams.length > 0)
-            {
-                saveExamsToFile(exams);
-            }
-            else
-            {
-                alert("Nothing to download.")
-            }
-        })
-        .catch(error => console.error('Error:', error));
+            .then(response => response.json())
+            .then(exams => {
+                if (exams && Array.isArray(exams) && exams.length > 0) {
+                    saveExamsToFile(exams);
+                }
+                else {
+                    alert("Nothing to download.")
+                }
+            })
+            .catch(error => console.error('Error:', error));
     });
 
-    function saveExamsToFile(exams)
-    {
+    function saveExamsToFile(exams) {
         const formattedExams = exams.map(exam => {
             return {
                 ...exam,
@@ -262,8 +297,8 @@
         document.body.removeChild(a);
     }
 
-    // Upload
-    document.getElementById('uploadButton').addEventListener('click', function() {
+    // Browse button
+    document.getElementById('fileInput').addEventListener('change', function () {
         const fileInput = document.getElementById('fileInput');
         const file = fileInput.files[0];
 
@@ -275,26 +310,24 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.list && Array.isArray(data.list)) {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.list && Array.isArray(data.list)) {
 
-                    data.list.forEach(exam => {
-                        addExam(exam.name, exam.date.substring(0, 10));
-                        exam.flashcards.forEach(flashcard => {
-                            addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                        data.list.forEach(exam => {
+                            addExam(exam.name, exam.date.substring(0, 10));
+                            exam.flashcards.forEach(flashcard => {
+                                addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                            });
                         });
-                    });
-                }
-                else
-                {
-                    console.error('Invalid data format received from the server.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                    }
+                    else {
+                        console.error('Invalid data format received from the server.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
-        else
-        {
+        else {
             alert('Please select a file to upload.');
         }
     });

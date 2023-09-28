@@ -12,8 +12,8 @@
     <button id="downloadButton">Download exams</button>
     </div>
     <div style="text-align: right;">
-    <button id="uploadButton">Upload file</button>
-    <input type="file" id="fileInput">
+    <label for="fileInput" id="browseButton" class="button-style">Browse</label>
+    <input type="file" id="fileInput" style="display: none;">
     </div>
 </div>
 <div id="exam-grid"></div>
@@ -206,9 +206,8 @@
         a.click();
         document.body.removeChild(a);
     }
-
-    // Upload
-    document.getElementById('uploadButton').addEventListener('click', function() {
+    // Browse button
+    document.getElementById('fileInput').addEventListener('change', function () {
         const fileInput = document.getElementById('fileInput');
         const file = fileInput.files[0];
 
@@ -220,26 +219,24 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.list && Array.isArray(data.list)) {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.list && Array.isArray(data.list)) {
 
-                    data.list.forEach(exam => {
-                        addExam(exam.name, exam.date.substring(0, 10));
-                        exam.flashcards.forEach(flashcard => {
-                            addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                        data.list.forEach(exam => {
+                            addExam(exam.name, exam.date.substring(0, 10));
+                            exam.flashcards.forEach(flashcard => {
+                                addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                            });
                         });
-                    });
-                }
-                else
-                {
-                    console.error('Invalid data format received from the server.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                    }
+                    else {
+                        console.error('Invalid data format received from the server.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
-        else
-        {
+        else {
             alert('Please select a file to upload.');
         }
     });

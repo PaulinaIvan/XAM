@@ -88,17 +88,19 @@ body {
   word-wrap: break-word; 
 }
 
-button, #fileInput {
+button, #browseButton {
   font-size: 16px;
   margin: 5px;
   background-color: #FCA311;
   border: 2px solid #ca820e;
   border-radius: 10px;
+  padding: 5px;
 }
 
 input {
   font-size: 16px;
   margin: 5px;
   border-radius: 8px;
+  padding: 8px;
   padding-left: 8px;
 }

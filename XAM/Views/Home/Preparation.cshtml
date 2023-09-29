@@ -168,6 +168,8 @@
             .catch(error => {
                 console.error('Error:', error);
             });
+        const fileInput = document.getElementById('fileInput');
+        fileInput.value = ''; // Clear the file input value
     }
 
     // Download
@@ -201,7 +203,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'custom_scripts.json';
+        a.download = 'ExamData.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

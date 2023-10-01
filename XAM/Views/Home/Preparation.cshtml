@@ -131,7 +131,7 @@
         backTextInput.value = '';
     }
 
-    function addFlashcard(frontTextValue, backTextValue, examNameValue)
+        function addFlashcard(frontTextValue, backTextValue, examNameValue)
     {
         const box = document.createElement('div');
         box.classList.add('box');
@@ -147,6 +147,13 @@
         boxBack.classList.add('box-back');
         boxBack.textContent = backTextValue;
 
+        const deleteButton = document.createElement('button');
+        deleteButton.innerHTML = "Delete Flashcard";
+        deleteButton.onclick = function() {
+            deleteFlashcard(examNameValue, frontTextValue);
+            box.remove();
+        };
+
         box.addEventListener('click', () => {
             boxInner.style.transform = (boxInner.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)');
         });
@@ -154,7 +161,20 @@
         boxInner.appendChild(boxFront);
         boxInner.appendChild(boxBack);
         box.appendChild(boxInner);
+        box.appendChild(deleteButton);
         document.getElementById(`${examNameValue}Grid`).appendChild(box);
+    }
+
+    function deleteFlashcard(examNameValue, frontTextValue)
+    {
+        fetch(`/Home/DeleteFlashcard?examName=${examNameValue}&frontText=${frontTextValue}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 
     function deleteExam(examNameValue)

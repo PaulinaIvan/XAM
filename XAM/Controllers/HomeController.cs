@@ -141,4 +141,25 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
+    public IActionResult DeleteFlashcard(string examName, string frontText)
+    {
+        var exam = _dataHolder.Exams.Find(e => e.Name == examName);
+        if (exam != null)
+        {
+            if (exam.RemoveFlashcard(frontText))
+            {
+                return Json(new { message = "Flashcard deleted successfully." });
+            }
+            else
+            {
+                return BadRequest(new { message = "Flashcard not found." });
+            }
+        }
+        else
+        {
+            return BadRequest(new { message = "Exam not found." });
+        }
+    }
+
 }

@@ -20,25 +20,25 @@
 
 <script>
     fetch(`/Home/FetchExams`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && Array.isArray(data) && data.length > 0)
-                    {
-                        data.forEach(exam => {
-                            addExam(exam.name, exam.date.substring(0, 10));
-                            exam.flashcards.forEach(flashcard => {
-                                addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
-                            });
-                        });
-                    }
-                    else
-                    {
-                        console.log('Invalid data format received from the server.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+        .then(response => response.json())
+        .then(data => {
+            if (data && Array.isArray(data) && data.length > 0)
+            {
+                data.forEach(exam => {
+                    addExam(exam.name, exam.date.substring(0, 10));
+                    exam.flashcards.forEach(flashcard => {
+                        addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                    });
                 });
+            }
+            else
+            {
+                console.log('Invalid data format received from the server.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 
     function createExam()
     {
@@ -56,7 +56,20 @@
             fetch(`/Home/CreateExam?name=${examNameValue}&date=${examDateValue}`)
                 .then(response => response.json())
                 .then(data => {
-                    addExam(data.name, data.date);
+                    if(data.errorCode === 'BadName')
+                    {
+                        alert('Use only letters, numbers and spaces in exam name.');
+                        throw new Error(data.errorMessage);
+                    }
+                    else if(data.errorCode === 'BadDate')
+                    {
+                        alert('Invalid date.');
+                        throw new Error(data.errorMessage);
+                    }
+                    else
+                    {
+                        addExam(data.name, data.date);
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);

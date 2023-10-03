@@ -7,6 +7,16 @@ namespace XAM.Controllers;
 
 public class HomeController : Controller
 {
+    // Requirements not achieved:
+    // 1.3 Creating and using your own record;
+    // 1.4 Creating and using your own enum;
+    // 3.2. Optional argument usage;
+    // 7. Create and use at least 1 generic type;
+    // 8.1. Boxing;
+    // 8.2. Unboxing;
+    // 9.1. LINQ to Objects usage (methods);
+    // 9.2. LINQ to Objects usage (queries);
+
     private readonly ILogger<HomeController> _logger;
     private readonly ExamDataSingleton _dataHolder;
 
@@ -38,6 +48,19 @@ public class HomeController : Controller
 
     public IActionResult CreateExam(string name, string date)
     {
+        if(!name.IsMadeOfLettersNumbersAndSpaces()) // 4. Extension method usage.
+        {
+            string error = "Invalid exam name.";
+            Console.WriteLine(error);
+
+            var errorResponse = new
+            {
+                ErrorCode = "BadName",
+                ErrorMessage = error
+            };
+            return Json(errorResponse);
+        }
+
         DateTime parsedDate;
         try
         {
@@ -45,10 +68,17 @@ public class HomeController : Controller
         }
         catch
         {
-            Console.WriteLine("Error.");
-            return BadRequest("Error.");
+            string error = "Unparseable date.";
+            Console.WriteLine(error);
+
+            var errorResponse = new
+            {
+                ErrorCode = "BadDate",
+                ErrorMessage = error
+            };
+            return Json(errorResponse);
         }
-        Exam newExam = new(name, parsedDate);
+        Exam newExam = new(name: name, date: parsedDate); // 3.1. Named argument usage;
 
         _dataHolder.Exams.Add(newExam);
 
@@ -105,7 +135,7 @@ public class HomeController : Controller
         {
             try
             {
-                using var reader = new StreamReader(file.OpenReadStream());
+                using var reader = new StreamReader(file.OpenReadStream()); // 6. Reading from a file using a stream.
                 var fileContent = reader.ReadToEnd();
                 List<Exam>? examsFromFile = JsonSerializer.Deserialize<List<Exam>>(fileContent,
                         new JsonSerializerOptions
@@ -114,7 +144,7 @@ public class HomeController : Controller
                         });
                 List<Exam> uniqueExams = new();
                 if(examsFromFile != null)
-                    foreach(Exam examFromFile in examsFromFile)
+                    foreach(Exam examFromFile in examsFromFile) // 5. Iterating through collection the right way.
                     {
                         if(_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
                             uniqueExams.Add(examFromFile);

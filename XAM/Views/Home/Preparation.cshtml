@@ -114,6 +114,9 @@
         examBox.textContent = `${examNameValue} - ${dateNameValue}`;
         examBox.appendChild(cardControls);
 
+        const examTimer = document.createElement('div');    //create the timer
+        setInterval(() => examTimer.textContent = generateExamTimerValue(dateNameValue), 1000);  //change the value of the timer every second
+
         createFlashcardButton.onclick = function() {
 			createFlashcard(frontTextInput, backTextInput, examNameValue);
 		};
@@ -124,6 +127,7 @@
 
         examBox.appendChild(cardControls);
         examBox.appendChild(flashcardGrid);
+        examBox.appendChild(examTimer);     //add the timer
         examGrid.appendChild(examBox);
         examBox.setAttribute('id', `${examNameValue}Id`);
         flashcardGrid.setAttribute('id', `${examNameValue}Grid`);
@@ -183,6 +187,20 @@
             });
         const fileInput = document.getElementById('fileInput');
         fileInput.value = ''; // Clear the file input value
+    }
+
+    function generateExamTimerValue(dateNameValue) {
+        const currentDate = new Date();
+        const examDate = new Date(dateNameValue);
+
+        const timeDifference = examDate - currentDate - 3 * 1000 * 3600;    //adjusted for timezone need to do it for all timezones or use a library
+        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+        const timeLeftUntilExam = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        return timeLeftUntilExam;
     }
 
     // Download

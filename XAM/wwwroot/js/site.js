@@ -130,8 +130,7 @@ function createFlashcard(frontTextInput, backTextInput, examNameValue)
     backTextInput.value = '';
 }
 
-function addFlashcard(frontTextValue, backTextValue, examNameValue)
-{
+function addFlashcard(frontTextValue, backTextValue, examNameValue) {
     const box = document.createElement('div');
     box.classList.add('box');
 
@@ -146,14 +145,48 @@ function addFlashcard(frontTextValue, backTextValue, examNameValue)
     boxBack.classList.add('box-back');
     boxBack.textContent = backTextValue;
 
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('delete-button');
+
+    deleteButton.addEventListener('click', () => {
+        // Call a function to delete the flashcard here
+        deleteFlashcard(examNameValue, box);
+    });
+
+
     box.addEventListener('click', () => {
         boxInner.style.transform = (boxInner.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)');
     });
 
     boxInner.appendChild(boxFront);
     boxInner.appendChild(boxBack);
+    boxInner.appendChild(deleteButton);
     box.appendChild(boxInner);
     document.getElementById(`${examNameValue}Grid`).appendChild(box);
+}
+
+function deleteFlashcard(examNameValue, flashcardElement) {
+    // Find the parent container of the flashcard
+    const flashcardGrid = document.getElementById(`${examNameValue}Grid`);
+
+    if (flashcardGrid && flashcardElement) {
+        // Get the index of the flashcard within its parent container
+        const flashcardIndex = Array.from(flashcardGrid.children).indexOf(flashcardElement);
+
+        // Remove the flashcard element from its parent
+        flashcardElement.remove();
+
+        // Check if there are no more flashcards in the container
+        if (flashcardGrid.childElementCount === 0) {
+            // If no more flashcards, remove the container as well
+            flashcardGrid.remove();
+        }
+
+        // Send an AJAX request to delete the flashcard from the server
+        const xhr = new XMLHttpRequest();
+        xhr.open('DELETE', `/Home/DeleteFlashcard?examName=${examNameValue}&flashcardIndex=${flashcardIndex}`);
+        xhr.send();
+    }
 }
 
 function deleteExam(examNameValue)

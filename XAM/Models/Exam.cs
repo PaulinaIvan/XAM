@@ -16,6 +16,11 @@ public class Exam : IComparable<Exam> // 1.1. Creating and using your own class.
     {
         return Name.CompareTo(other?.Name);
     }
+
+    public void DeleteFlashcard(Flashcard flashcard)
+    {
+        Flashcards.Remove(flashcard);
+    }
 }
 
 public struct Flashcard // 1.2. Creating and using your own struct.

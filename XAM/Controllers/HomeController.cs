@@ -52,7 +52,7 @@ public class HomeController : Controller
 
     public IActionResult CreateExam(string name, string date)
     {
-        if(!name.IsMadeOfLettersNumbersAndSpaces()) // 4. Extension method usage.
+        if (!name.IsMadeOfLettersNumbersAndSpaces()) // 4. Extension method usage.
         {
             string error = "Invalid exam name.";
             Console.WriteLine(error);
@@ -95,7 +95,7 @@ public class HomeController : Controller
     public IActionResult DeleteExam(string examName)
     {
         Exam? examToDelete = _dataHolder.Exams.Find(exam => exam.Name == examName);
-        if(examToDelete != null)
+        if (examToDelete != null)
         {
             _dataHolder.Exams.Remove(examToDelete);
             return Json("File uploaded and parsed successfully.");
@@ -110,14 +110,52 @@ public class HomeController : Controller
     {
         try
         {
-            _dataHolder.Exams.Find(exam => exam.Name == examName)?.Flashcards.Add(new Flashcard(frontText, backText));
+            Exam? exam = _dataHolder.Exams.Find(exam => exam.Name == examName);
+            if (exam == null)
+            {
+                return BadRequest("Exam not found.");
+            }
+
+            Flashcard flashcard = new Flashcard(frontText, backText);
+            exam.Flashcards.Add(flashcard);
+
+            int index = exam.Flashcards.IndexOf(flashcard);
+
             var result = new
             {
                 FrontText = frontText,
                 BackText = backText,
-                ExamName = examName
+                ExamName = examName,
+                Index = index
             };
             return Json(result);
+        }
+        catch
+        {
+            Console.WriteLine("Error.");
+            return BadRequest("Error.");
+        }
+    }
+
+    [HttpDelete]
+    public IActionResult DeleteFlashcard(string examName, int flashcardIndex)
+    {
+        try
+        {
+            Exam? exam = _dataHolder.Exams.Find(exam => exam.Name == examName);
+            if (exam == null)
+            {
+                return BadRequest("Exam not found.");
+            }
+
+            if (flashcardIndex < 0 || flashcardIndex >= exam.Flashcards.Count)
+            {
+                return BadRequest("Flashcard not found.");
+            }
+
+            exam.Flashcards.RemoveAt(flashcardIndex);
+
+            return Ok();
         }
         catch
         {
@@ -138,7 +176,7 @@ public class HomeController : Controller
             try
             {
                 List<Exam> uniqueExams = new();
-                using(var reader = new StreamReader(file.OpenReadStream())) // 6. Reading from a file using a stream.
+                using (var reader = new StreamReader(file.OpenReadStream())) // 6. Reading from a file using a stream.
                 {
                     var fileContent = reader.ReadToEnd();
                     List<Exam>? examsFromFile = JsonSerializer.Deserialize<List<Exam>>(fileContent,
@@ -146,15 +184,15 @@ public class HomeController : Controller
                         {
                             PropertyNameCaseInsensitive = true,
                         });
-                    
-                    if(examsFromFile != null)
-                        foreach(Exam examFromFile in examsFromFile) // 5. Iterating through collection the right way.
+
+                    if (examsFromFile != null)
+                        foreach (Exam examFromFile in examsFromFile) // 5. Iterating through collection the right way.
                         {
-                            if(_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
+                            if (_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
                                 uniqueExams.Add(examFromFile);
                         }
 
-                    if(examsFromFile != null)
+                    if (examsFromFile != null)
                         _dataHolder.Exams.AddRange(uniqueExams);
                 }
                 return Json(new { message = "File uploaded and parsed successfully.", list = uniqueExams });

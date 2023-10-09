@@ -65,7 +65,7 @@ function createExam()
     document.getElementById('examDate').value = '';
 }
 
-function addExam(examNameValue, dateNameValue)
+function addExam(examNameValue, dateStringValue)
 {
     const examGrid = document.getElementById('exam-grid');
 
@@ -92,11 +92,12 @@ function addExam(examNameValue, dateNameValue)
 
     const examBox = document.createElement('div');
     examBox.classList.add("exam-box");
-    examBox.textContent = `${examNameValue} - ${dateNameValue}`;
+    examBox.textContent = `${examNameValue} - ${dateStringValue}`;
     examBox.appendChild(cardControls);
 
-    const examTimer = document.createElement('div');    //create the timer
-    setInterval(() => examTimer.textContent = generateExamTimerValue(dateNameValue), 1000);  //change the value of the timer every second
+    const examTimer = document.createElement('div');
+    generateExamTimerValue(dateStringValue, examTimer);
+    setInterval(() => generateExamTimerValue(dateStringValue, examTimer), 1000);
 
     createFlashcardButton.onclick = function() {
         createFlashcard(frontTextInput, backTextInput, examNameValue);
@@ -108,7 +109,7 @@ function addExam(examNameValue, dateNameValue)
 
     examBox.appendChild(cardControls);
     examBox.appendChild(flashcardGrid);
-    examBox.appendChild(examTimer);     //add the timer
+    examBox.appendChild(examTimer);
     examGrid.appendChild(examBox);
     examBox.setAttribute('id', `${examNameValue}Id`);
     flashcardGrid.setAttribute('id', `${examNameValue}Grid`);
@@ -170,19 +171,19 @@ function deleteExam(examNameValue)
     fileInput.value = ''; // Clear the file input value
 }
 
-function generateExamTimerValue(dateNameValue) 
+function generateExamTimerValue(dateStringValue, location) 
 {
     const currentDate = new Date();
-    const examDate = new Date(dateNameValue);
+    const examDate = new Date(dateStringValue);
 
-    const timeDifference = examDate - currentDate - 3 * 1000 * 3600;    //adjusted for timezone need to do it for all timezones or use a library
+    const timeDifference = examDate - currentDate - 3 * 1000 * 3600;
     const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
     const timeLeftUntilExam = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-    return timeLeftUntilExam;
+    location.textContent = timeLeftUntilExam;
 }
 
 // Download

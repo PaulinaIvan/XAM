@@ -171,7 +171,7 @@ function deleteExam(examNameValue)
     fileInput.value = ''; // Clear the file input value
 }
 
-function generateExamTimerValue(dateStringValue, location) 
+function generateExamTimerValue(dateStringValue, locationDiv) 
 {
     const currentDate = new Date();
     const examDate = new Date(dateStringValue);
@@ -182,8 +182,36 @@ function generateExamTimerValue(dateStringValue, location)
     const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-    const timeLeftUntilExam = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-    location.textContent = timeLeftUntilExam;
+    // Text
+    var timeLeftUntilExam = 'Time is up :)';
+    if(timeDifference > 0)
+    {
+        timeLeftUntilExam = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    locationDiv.textContent = timeLeftUntilExam;
+
+    // Color
+
+    const blackColor = [0, 0, 0];
+    const redColor = [255, 0, 0];
+
+    const textColor = lerpColor(redColor, blackColor, clamp(timeDifference / (1000 * 3600 * 24 * 7), 0, 1));
+
+    locationDiv.style.color = textColor;
+}
+
+function lerpColor(color1, color2, t)
+{
+    const r = Math.round(color1[0] + t * (color2[0] - color1[0]));
+    const g = Math.round(color1[1] + t * (color2[1] - color1[1]));
+    const b = Math.round(color1[2] + t * (color2[2] - color1[2]));
+    return `rgb(${r},${g},${b})`;
+}
+
+function clamp(value, min, max)
+{
+    return Math.min(Math.max(value, min), max);
 }
 
 // Download

@@ -1,5 +1,6 @@
-public class Exam
+public class Exam : IComparable<Exam> // 1.1. Creating and using your own class.
 {
+    // 2.1. Property usage in class.
     public string Name { get; set; }
     public DateTime Date { get; set; }
     public List<Flashcard> Flashcards { get; set; } // List of flashcards
@@ -10,22 +11,26 @@ public class Exam
         Date = date;
         Flashcards = new List<Flashcard>(); // Initialize the list of flashcards
     }
-
-    // Method to remove a flashcard
     public bool RemoveFlashcard(string frontText)
-    {
-        var flashcardToRemove = Flashcards.FirstOrDefault(f => f.FrontText == frontText);
-        if (!flashcardToRemove.Equals(default(Flashcard))) // Check if flashcard was found
-        {
-            Flashcards.Remove(flashcardToRemove);
-            return true; // Successfully removed
-        }
-        return false; // Not found
-    }
-
-
-    public struct Flashcard
 {
+    var flashcardToRemove = Flashcards.FirstOrDefault(f => f.FrontText == frontText);
+    
+    if (flashcardToRemove.FrontText != null) 
+    {
+        return Flashcards.Remove(flashcardToRemove);
+    }
+    return false;
+}
+
+    public int CompareTo(Exam? other) // 10. Implement at least one of the standard .NET interfaces (IEnumerable, IComparable, IComparer, IEquatable, IEnumerator, etc.).
+    {
+        return Name.CompareTo(other?.Name);
+    }
+}
+
+public struct Flashcard // 1.2. Creating and using your own struct.
+{
+    // 2.2. Property usage in struct.
     public string FrontText { get; set; }
     public string BackText { get; set; }
 
@@ -34,5 +39,4 @@ public class Exam
         FrontText = frontText;
         BackText = backText;
     }
-}
 }

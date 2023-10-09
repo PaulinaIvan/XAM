@@ -10,8 +10,7 @@ public class HomeController : Controller
     // Requirements not achieved:
     // 1.4 Creating and using your own enum;
     // 7. Create and use at least 1 generic type;
-    // 8.1. Boxing;
-    // 8.2. Unboxing;
+    // 8. Boxing and Unboxing;
 
     private readonly ILogger<HomeController> _logger;
     private readonly ExamDataSingleton _dataHolder;
@@ -138,24 +137,26 @@ public class HomeController : Controller
         {
             try
             {
-                using var reader = new StreamReader(file.OpenReadStream()); // 6. Reading from a file using a stream.
-                var fileContent = reader.ReadToEnd();
-                List<Exam>? examsFromFile = JsonSerializer.Deserialize<List<Exam>>(fileContent,
+                List<Exam> uniqueExams = new();
+                using(var reader = new StreamReader(file.OpenReadStream())) // 6. Reading from a file using a stream.
+                {
+                    var fileContent = reader.ReadToEnd();
+                    List<Exam>? examsFromFile = JsonSerializer.Deserialize<List<Exam>>(fileContent,
                         new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,
                         });
-                List<Exam> uniqueExams = new();
-                if(examsFromFile != null)
-                    foreach(Exam examFromFile in examsFromFile) // 5. Iterating through collection the right way.
-                    {
-                        if(_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
-                            uniqueExams.Add(examFromFile);
-                    }
+                    
+                    if(examsFromFile != null)
+                        foreach(Exam examFromFile in examsFromFile) // 5. Iterating through collection the right way.
+                        {
+                            if(_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
+                                uniqueExams.Add(examFromFile);
+                        }
 
-                if(examsFromFile != null)
-                    _dataHolder.Exams.AddRange(uniqueExams);
-
+                    if(examsFromFile != null)
+                        _dataHolder.Exams.AddRange(uniqueExams);
+                }
                 return Json(new { message = "File uploaded and parsed successfully.", list = uniqueExams });
             }
             catch (Exception ex)

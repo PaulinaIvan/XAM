@@ -176,12 +176,6 @@ function deleteFlashcard(examNameValue, flashcardElement) {
         // Remove the flashcard element from its parent
         flashcardElement.remove();
 
-        // Check if there are no more flashcards in the container
-        if (flashcardGrid.childElementCount === 0) {
-            // If no more flashcards, remove the container as well
-            flashcardGrid.remove();
-        }
-
         // Send an AJAX request to delete the flashcard from the server
         const xhr = new XMLHttpRequest();
         xhr.open('DELETE', `/Home/DeleteFlashcard?examName=${examNameValue}&flashcardIndex=${flashcardIndex}`);

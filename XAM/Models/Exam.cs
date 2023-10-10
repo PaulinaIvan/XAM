@@ -1,15 +1,28 @@
 public class Exam : IComparable<Exam> // 1.1. Creating and using your own class.
 {
-    // 2.1. Property usage in class.
-    public string Name { get; set; }
-    public DateTime Date { get; set; }
+    private string NameField;
+    public string Name { get { return NameField; } set { NameField = value; ValidNameCheck(value); } } // 2.1. Property usage in class.
+    public DateTime Date { get; set;}
     public List<Flashcard> Flashcards { get; set; } // List of flashcards
 
     public Exam(string name, DateTime date)
     {
-        Name = name;
+        NameField = name;
         Date = date;
         Flashcards = new List<Flashcard>(); // Initialize the list of flashcards
+    }
+
+    private void ValidNameCheck(string newName)
+    {
+        try
+        {
+            if(!newName.IsMadeOfLettersNumbersAndSpaces() || newName == "")
+                throw new Exception();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.StackTrace);
+        }
     }
 
     public int CompareTo(Exam? other) // 10. Implement at least one of the standard .NET interfaces (IEnumerable, IComparable, IComparer, IEquatable, IEnumerator, etc.).

@@ -2,7 +2,7 @@ public class Exam : IComparable<Exam> // 1.1. Creating and using your own class.
 {
     private string NameField;
     public string Name { get { return NameField; } set { NameField = value; ValidNameCheck(value); } } // 2.1. Property usage in class.
-    public DateTime Date { get; set;}
+    public DateTime Date { get; set; }
     public List<Flashcard> Flashcards { get; set; } // List of flashcards
 
     public Exam(string name, DateTime date)

@@ -33,6 +33,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult Statistics()
+    {
+        return View();
+    }
+
     public IActionResult About()
     {
         return View();
@@ -47,9 +52,17 @@ public class HomeController : Controller
         // (Same thing as above, but with queries)
         // List<Exam> correctlyNamedExams = (from exam in _dataHolder.Exams where exam.Name.IsMadeOfLettersNumbersAndSpaces() select exam).ToList();
 
-        Console.WriteLine(ExamDataHolder.SomeCounter++);
-
         return Json(correctlyNamedExams);
+    }
+
+    public IActionResult FetchStatistics()
+    {
+        var result = new
+        {
+            lifetimeExams = ExamDataHolder.LifetimeCreatedExamsCounter,
+            lifetimeFlashcards = ExamDataHolder.LifetimeCreatedFlashcardsCounter
+        };
+        return Json(result);
     }
 
     public IActionResult CreateExam(string name, string date)
@@ -79,6 +92,7 @@ public class HomeController : Controller
         Exam newExam = new(date: parsedDate, name: name); // 3.1. Named argument usage;
 
         _dataHolder.Exams.Add(newExam);
+        ++ExamDataHolder.LifetimeCreatedExamsCounter;
 
         var result = new
         {
@@ -120,6 +134,8 @@ public class HomeController : Controller
 
             Flashcard flashcard = new Flashcard(frontText, backText);
             exam.Flashcards.Add(flashcard);
+
+            ++ExamDataHolder.LifetimeCreatedFlashcardsCounter;
 
             int index = exam.Flashcards.IndexOf(flashcard);
 

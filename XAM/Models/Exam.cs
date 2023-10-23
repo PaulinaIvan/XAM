@@ -1,7 +1,7 @@
-public class Exam : IComparable<Exam> // 1.1. Creating and using your own class.
+public class Exam : IComparable<Exam>
 {
     private string NameField;
-    public string Name { get { return NameField; } set { NameField = value; ValidNameCheck(value); } } // 2.1. Property usage in class.
+    public string Name { get { return NameField; } set { NameField = value; ValidNameCheck(value); } }
     public DateTime Date { get; set; }
     public List<Flashcard> Flashcards { get; set; } // List of flashcards
 
@@ -25,7 +25,7 @@ public class Exam : IComparable<Exam> // 1.1. Creating and using your own class.
         }
     }
 
-    public int CompareTo(Exam? other) // 10. Implement at least one of the standard .NET interfaces (IEnumerable, IComparable, IComparer, IEquatable, IEnumerator, etc.).
+    public int CompareTo(Exam? other)
     {
         return Name.CompareTo(other?.Name);
     }
@@ -36,9 +36,8 @@ public class Exam : IComparable<Exam> // 1.1. Creating and using your own class.
     }
 }
 
-public struct Flashcard // 1.2. Creating and using your own struct.
+public struct Flashcard
 {
-    // 2.2. Property usage in struct.
     public string FrontText { get; set; }
     public string BackText { get; set; }
 

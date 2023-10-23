@@ -13,11 +13,11 @@ public class HomeController : Controller
     // 8. Boxing and Unboxing;
 
     private readonly ILogger<HomeController> _logger;
-    private readonly ExamDataSingleton _dataHolder;
+    private readonly ExamDataHolder _dataHolder;
 
     public record ErrorRecord(string ErrorCode, string ErrorMessage); // 1.3 Creating and using your own record;
 
-    public HomeController(ILogger<HomeController> logger, ExamDataSingleton dataHolder)
+    public HomeController(ILogger<HomeController> logger, ExamDataHolder dataHolder)
     {
         _logger = logger;
         _dataHolder = dataHolder;
@@ -46,6 +46,8 @@ public class HomeController : Controller
         // 9.2. LINQ to Objects usage (queries);
         // (Same thing as above, but with queries)
         // List<Exam> correctlyNamedExams = (from exam in _dataHolder.Exams where exam.Name.IsMadeOfLettersNumbersAndSpaces() select exam).ToList();
+
+        Console.WriteLine(ExamDataHolder.SomeCounter++);
 
         return Json(correctlyNamedExams);
     }

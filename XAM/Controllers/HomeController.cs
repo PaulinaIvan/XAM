@@ -21,11 +21,11 @@ public class HomeController : Controller
     // 11. Unit and integration tests coverage at least 20%
 
     private readonly ILogger<HomeController> _logger;
-    private readonly ExamDataHolder _dataHolder;
+    private readonly DataHolder _dataHolder;
 
     public record ErrorRecord(string ErrorCode, string ErrorMessage);
 
-    public HomeController(ILogger<HomeController> logger, ExamDataHolder dataHolder)
+    public HomeController(ILogger<HomeController> logger, DataHolder dataHolder)
     {
         _logger = logger;
         _dataHolder = dataHolder;
@@ -189,7 +189,7 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public IActionResult DownloadAllExams()
+    public IActionResult DownloadAllData()
     {
         var jsonContent = JsonSerializer.Serialize(_dataHolder);
 
@@ -197,7 +197,7 @@ public class HomeController : Controller
         return Content(jsonContent, "application/json");
     }
 
-    public IActionResult UploadExamFile(IFormFile file)
+    public IActionResult UploadDataFile(IFormFile file)
     {
         if (file != null && file.Length > 0)
         {
@@ -206,7 +206,7 @@ public class HomeController : Controller
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
                     var fileContent = reader.ReadToEnd();
-                    ExamDataHolder? newDataHolder = JsonSerializer.Deserialize<ExamDataHolder>(fileContent,
+                    DataHolder? newDataHolder = JsonSerializer.Deserialize<DataHolder>(fileContent,
                         new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,

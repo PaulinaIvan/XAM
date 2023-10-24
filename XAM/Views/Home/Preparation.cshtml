@@ -8,7 +8,7 @@
     <input type="text" id="examName" placeholder="Exam name">
     <input type="date" id="examDate">
     <button onclick="createExam()">Add exam</button>
-    <button id="downloadButton">Download exams</button>
+    <button id="downloadButton">Download data</button>
     </div>
     <div style="text-align: right;">
     <label for="fileInput" id="browseButton" class="button-style">Browse</label>
@@ -257,7 +257,7 @@
 
     // Download
     document.getElementById('downloadButton').addEventListener('click', function () {
-        fetch('/Home/DownloadAllExams')
+        fetch('/Home/DownloadAllData')
             .then(response => {
                 if (response.ok) {
                     return response.blob();
@@ -269,7 +269,7 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'ExamData.json';
+                a.download = 'XamData.json';
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
@@ -286,7 +286,7 @@
         const formData = new FormData();
         formData.append('file', file);
 
-        fetch('/Home/UploadExamFile', {
+        fetch('/Home/UploadDataFile', {
             method: 'POST',
             body: formData
         })

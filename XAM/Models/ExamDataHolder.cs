@@ -1,4 +1,4 @@
-public class ExamDataHolder
+public class DataHolder
 {
     public List<Exam> Exams { get; set; } = new();
 

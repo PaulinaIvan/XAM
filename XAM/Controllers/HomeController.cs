@@ -188,9 +188,15 @@ public class HomeController : Controller
         }
     }
 
-    public IActionResult GetAllExams()
+    [HttpGet]
+    public IActionResult DownloadAllExams()
     {
-        return Json(_dataHolder.Exams);
+        var exams = _dataHolder.Exams;
+
+        var jsonContent = JsonSerializer.Serialize(exams);
+
+        Response.Headers.Add("Content-Disposition", "attachment");
+        return Content(jsonContent, "application/json");
     }
 
     public IActionResult UploadExamFile(IFormFile file)

@@ -30,10 +30,6 @@
                 });
             });
         }
-        else
-        {
-            console.log('Invalid data format received from the server.');
-        }
     })
     .catch(error => {
         console.error('Error:', error);
@@ -260,41 +256,26 @@
     }
 
     // Download
-    document.getElementById('downloadButton').addEventListener('click', function() {
-    fetch('/Home/GetAllExams')
-    .then(response => response.json())
-    .then(exams => {
-        if(exams && Array.isArray(exams) && exams.length > 0)
-        {
-            saveExamsToFile(exams);
-        }
-        else
-        {
-            alert("Nothing to download.")
-        }
-    })
-    .catch(error => console.error('Error:', error));
+    document.getElementById('downloadButton').addEventListener('click', function () {
+        fetch('/Home/DownloadAllExams')
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error('Failed to download exams.');
+                }
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ExamData.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => console.error('Error:', error));
     });
-
-    function saveExamsToFile(exams)
-    {
-        const formattedExams = exams.map(exam => {
-            return {
-                ...exam,
-                date: exam.date.substring(0, 10)
-            };
-        });
-
-        const jsonContent = JSON.stringify(formattedExams);
-        const blob = new Blob([jsonContent], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'ExamData.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
 
     // Browse button
     document.getElementById('fileInput').addEventListener('change', function () {

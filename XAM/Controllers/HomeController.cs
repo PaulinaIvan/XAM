@@ -21,11 +21,11 @@ public class HomeController : Controller
     // 11. Unit and integration tests coverage at least 20%
 
     private readonly ILogger<HomeController> _logger;
-    private readonly ExamDataSingleton _dataHolder;
+    private readonly DataHolder _dataHolder;
 
     public record ErrorRecord(string ErrorCode, string ErrorMessage);
 
-    public HomeController(ILogger<HomeController> logger, ExamDataSingleton dataHolder)
+    public HomeController(ILogger<HomeController> logger, DataHolder dataHolder)
     {
         _logger = logger;
         _dataHolder = dataHolder;
@@ -37,6 +37,11 @@ public class HomeController : Controller
     }
 
     public IActionResult Preparation()
+    {
+        return View();
+    }
+
+    public IActionResult Statistics()
     {
         return View();
     }
@@ -54,6 +59,16 @@ public class HomeController : Controller
         // List<Exam> correctlyNamedExams = (from exam in _dataHolder.Exams where exam.Name.IsMadeOfLettersNumbersAndSpaces() select exam).ToList();
 
         return Json(correctlyNamedExams);
+    }
+
+    public IActionResult FetchStatistics()
+    {
+        var result = new
+        {
+            lifetimeExams = _dataHolder.LifetimeCreatedExamsCounter,
+            lifetimeFlashcards = _dataHolder.LifetimeCreatedFlashcardsCounter
+        };
+        return Json(result);
     }
 
     public IActionResult CreateExam(string name, string date)
@@ -83,6 +98,7 @@ public class HomeController : Controller
         Exam newExam = new(date: parsedDate, name: name);
 
         _dataHolder.Exams.Add(newExam);
+        ++_dataHolder.LifetimeCreatedExamsCounter;
 
         var result = new
         {
@@ -124,6 +140,8 @@ public class HomeController : Controller
 
             Flashcard flashcard = new Flashcard(frontText, backText);
             exam.Flashcards.Add(flashcard);
+
+            ++_dataHolder.LifetimeCreatedFlashcardsCounter;
 
             int index = exam.Flashcards.IndexOf(flashcard);
 
@@ -170,38 +188,42 @@ public class HomeController : Controller
         }
     }
 
-    public IActionResult GetAllExams()
+    [HttpGet]
+    public IActionResult DownloadAllData()
     {
-        return Json(_dataHolder.Exams);
+        var jsonContent = JsonSerializer.Serialize(_dataHolder);
+
+        Response.Headers.Add("Content-Disposition", "attachment");
+        return Content(jsonContent, "application/json");
     }
 
-    public IActionResult UploadExamFile(IFormFile file)
+    public IActionResult UploadDataFile(IFormFile file)
     {
         if (file != null && file.Length > 0)
         {
             try
             {
-                List<Exam> uniqueExams = new();
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
                     var fileContent = reader.ReadToEnd();
-                    List<Exam>? examsFromFile = JsonSerializer.Deserialize<List<Exam>>(fileContent,
+                    DataHolder? newDataHolder = JsonSerializer.Deserialize<DataHolder>(fileContent,
                         new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,
                         });
 
-                    if (examsFromFile != null)
-                        foreach (Exam examFromFile in examsFromFile)
-                        {
-                            if (_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
-                                uniqueExams.Add(examFromFile);
-                        }
+                    if (newDataHolder != null)
+                    {
+                        List<Exam> examsNotOnFrontend = newDataHolder.Exams.Where(examA => !_dataHolder.Exams.Any(examB => examA.Name == examB.Name)).ToList();
+                        _dataHolder.Exams.AddRange(examsNotOnFrontend);
+                        _dataHolder.LifetimeCreatedExamsCounter = newDataHolder.LifetimeCreatedExamsCounter;
+                        _dataHolder.LifetimeCreatedFlashcardsCounter = newDataHolder.LifetimeCreatedFlashcardsCounter;
 
-                    if (examsFromFile != null)
-                        _dataHolder.Exams.AddRange(uniqueExams);
+                        return Json(new { message = "File uploaded and parsed successfully.", list = examsNotOnFrontend });
+                    }
                 }
-                return Json(new { message = "File uploaded and parsed successfully.", list = uniqueExams });
+
+                return StatusCode(500, new { message = "An error occurred while processing the file." });
             }
             catch (Exception ex)
             {
@@ -213,6 +235,7 @@ public class HomeController : Controller
             return BadRequest(new { message = "No file was selected for upload." });
         }
     }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Statistics";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <div id="lifetimeExams">Amount of exams ever created:</div>
+    <div id="lifetimeFlashcards">Amount of flashcards ever created:</div>
+</div>
+
+<script>
+    fetch(`/Home/FetchStatistics`)
+    .then(response => response.json())
+    .then(data => {
+        if (data !== null)
+        {
+            document.getElementById("lifetimeExams").innerText += ` ${data.lifetimeExams}`;
+            document.getElementById("lifetimeFlashcards").innerText += ` ${data.lifetimeFlashcards}`;
+        }
+        else
+        {
+            console.log('Invalid data format received from the server.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+</script>

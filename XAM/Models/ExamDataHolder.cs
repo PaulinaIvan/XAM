@@ -1,7 +1,7 @@
 public class ExamDataHolder
 {
-    public List<Exam> Exams = new();
+    public List<Exam> Exams { get; set; } = new();
 
-    public static int LifetimeCreatedExamsCounter { get; set; }
-    public static int LifetimeCreatedFlashcardsCounter { get; set; }
+    public int LifetimeCreatedExamsCounter { get; set; }
+    public int LifetimeCreatedFlashcardsCounter { get; set; }
 }

@@ -65,8 +65,8 @@ public class HomeController : Controller
     {
         var result = new
         {
-            lifetimeExams = ExamDataHolder.LifetimeCreatedExamsCounter,
-            lifetimeFlashcards = ExamDataHolder.LifetimeCreatedFlashcardsCounter
+            lifetimeExams = _dataHolder.LifetimeCreatedExamsCounter,
+            lifetimeFlashcards = _dataHolder.LifetimeCreatedFlashcardsCounter
         };
         return Json(result);
     }
@@ -98,7 +98,7 @@ public class HomeController : Controller
         Exam newExam = new(date: parsedDate, name: name);
 
         _dataHolder.Exams.Add(newExam);
-        ++ExamDataHolder.LifetimeCreatedExamsCounter;
+        ++_dataHolder.LifetimeCreatedExamsCounter;
 
         var result = new
         {
@@ -141,7 +141,7 @@ public class HomeController : Controller
             Flashcard flashcard = new Flashcard(frontText, backText);
             exam.Flashcards.Add(flashcard);
 
-            ++ExamDataHolder.LifetimeCreatedFlashcardsCounter;
+            ++_dataHolder.LifetimeCreatedFlashcardsCounter;
 
             int index = exam.Flashcards.IndexOf(flashcard);
 
@@ -191,9 +191,7 @@ public class HomeController : Controller
     [HttpGet]
     public IActionResult DownloadAllExams()
     {
-        var exams = _dataHolder.Exams;
-
-        var jsonContent = JsonSerializer.Serialize(exams);
+        var jsonContent = JsonSerializer.Serialize(_dataHolder);
 
         Response.Headers.Add("Content-Disposition", "attachment");
         return Content(jsonContent, "application/json");
@@ -205,27 +203,27 @@ public class HomeController : Controller
         {
             try
             {
-                List<Exam> uniqueExams = new();
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
                     var fileContent = reader.ReadToEnd();
-                    List<Exam>? examsFromFile = JsonSerializer.Deserialize<List<Exam>>(fileContent,
+                    ExamDataHolder? newDataHolder = JsonSerializer.Deserialize<ExamDataHolder>(fileContent,
                         new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,
                         });
 
-                    if (examsFromFile != null)
-                        foreach (Exam examFromFile in examsFromFile)
-                        {
-                            if (_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
-                                uniqueExams.Add(examFromFile);
-                        }
+                    if (newDataHolder != null)
+                    {
+                        List<Exam> examsNotOnFrontend = newDataHolder.Exams.Where(examA => !_dataHolder.Exams.Any(examB => examA.Name == examB.Name)).ToList();
+                        _dataHolder.Exams.AddRange(examsNotOnFrontend);
+                        _dataHolder.LifetimeCreatedExamsCounter = newDataHolder.LifetimeCreatedExamsCounter;
+                        _dataHolder.LifetimeCreatedFlashcardsCounter = newDataHolder.LifetimeCreatedFlashcardsCounter;
 
-                    if (examsFromFile != null)
-                        _dataHolder.Exams.AddRange(uniqueExams);
+                        return Json(new { message = "File uploaded and parsed successfully.", list = examsNotOnFrontend });
+                    }
                 }
-                return Json(new { message = "File uploaded and parsed successfully.", list = uniqueExams });
+
+                return StatusCode(500, new { message = "An error occurred while processing the file." });
             }
             catch (Exception ex)
             {
@@ -237,6 +235,7 @@ public class HomeController : Controller
             return BadRequest(new { message = "No file was selected for upload." });
         }
     }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

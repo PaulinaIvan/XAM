@@ -8,14 +8,22 @@ namespace XAM.Controllers;
 public class HomeController : Controller
 {
     // Requirements not achieved:
-    // 1.4 Creating and using your own enum;
-    // 7. Create and use at least 1 generic type;
-    // 8. Boxing and Unboxing;
+    // 1. Relational database is used for storing data
+    // 2. Create generic method, event or delegate; define at least 2 generic constraints
+    // 3. Delegates usage
+    // 4. Create at least 1 exception type and throw it; meaningfully deal with it; (most of the exceptions are logged to a file or a server)
+    // 5. Lambda expressions usage
+    // 6. Usage of threading via Thread class
+    // 7. Usage of async/await
+    // 8. Use at least 1 concurrent collection or Monitor
+    // 9. Regex usage
+    // 10. No instances are created using 'new' keyword, dependency injection is used everywhere
+    // 11. Unit and integration tests coverage at least 20%
 
     private readonly ILogger<HomeController> _logger;
     private readonly ExamDataHolder _dataHolder;
 
-    public record ErrorRecord(string ErrorCode, string ErrorMessage); // 1.3 Creating and using your own record;
+    public record ErrorRecord(string ErrorCode, string ErrorMessage);
 
     public HomeController(ILogger<HomeController> logger, ExamDataHolder dataHolder)
     {
@@ -45,10 +53,8 @@ public class HomeController : Controller
 
     public IActionResult FetchExams()
     {
-        // 9.1. LINQ to Objects usage (methods);
         List<Exam> correctlyNamedExams = _dataHolder.Exams.Where(exam => exam.Name.IsMadeOfLettersNumbersAndSpaces()).ToList();
 
-        // 9.2. LINQ to Objects usage (queries);
         // (Same thing as above, but with queries)
         // List<Exam> correctlyNamedExams = (from exam in _dataHolder.Exams where exam.Name.IsMadeOfLettersNumbersAndSpaces() select exam).ToList();
 
@@ -67,7 +73,7 @@ public class HomeController : Controller
 
     public IActionResult CreateExam(string name, string date)
     {
-        if (!name.IsMadeOfLettersNumbersAndSpaces()) // 4. Extension method usage.
+        if (!name.IsMadeOfLettersNumbersAndSpaces())
         {
             string error = "Invalid exam name.";
             Console.WriteLine(error);
@@ -89,7 +95,7 @@ public class HomeController : Controller
             ErrorRecord errorResponse = CreateErrorResponse("BadDate", error);
             return Json(errorResponse);
         }
-        Exam newExam = new(date: parsedDate, name: name); // 3.1. Named argument usage;
+        Exam newExam = new(date: parsedDate, name: name);
 
         _dataHolder.Exams.Add(newExam);
         ++ExamDataHolder.LifetimeCreatedExamsCounter;
@@ -102,7 +108,7 @@ public class HomeController : Controller
         return Json(result);
     }
 
-    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.") // 3.2. Optional argument usage;
+    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
     {
         ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
         return ErrorResponse;
@@ -194,7 +200,7 @@ public class HomeController : Controller
             try
             {
                 List<Exam> uniqueExams = new();
-                using (var reader = new StreamReader(file.OpenReadStream())) // 6. Reading from a file using a stream.
+                using (var reader = new StreamReader(file.OpenReadStream()))
                 {
                     var fileContent = reader.ReadToEnd();
                     List<Exam>? examsFromFile = JsonSerializer.Deserialize<List<Exam>>(fileContent,
@@ -204,7 +210,7 @@ public class HomeController : Controller
                         });
 
                     if (examsFromFile != null)
-                        foreach (Exam examFromFile in examsFromFile) // 5. Iterating through collection the right way.
+                        foreach (Exam examFromFile in examsFromFile)
                         {
                             if (_dataHolder.Exams.Find(exam => exam.Name == examFromFile.Name) == null)
                                 uniqueExams.Add(examFromFile);

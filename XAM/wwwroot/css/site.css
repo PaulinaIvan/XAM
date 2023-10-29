@@ -92,7 +92,15 @@ body {
   word-wrap: break-word; 
 }
 
-button, #browseButton {
+button {
+  font-size: 16px;
+  margin: 5px;
+  background-color: #FCA311;
+  border: 2px solid #ca820e;
+  border-radius: 10px;
+}
+
+#browseButton {
   font-size: 16px;
   margin: 5px;
   background-color: #FCA311;

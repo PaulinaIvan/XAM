@@ -3,17 +3,76 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-<div style="display: grid; grid-template-columns: 180px 150px 80px;">
-    <div>
-        <p>Challenge yourself with exam:</p>
-    </div>
-    <div>
-        <select id="examsDropdown">
-            <option selected disabled hidden>Choose an exam</option>
-        </select>
-    </div>
-    <div>
-        <button id="challengeStartButton">Start!</button>
+<style>
+    #challengeModeBox {
+        border: 5px solid #E5E5E5;
+        border-radius: 10px;
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #ffffff;
+	}
+
+	#challengeModeDimmerBackground {
+		display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.5);
+		z-index: 1000;
+	}
+	
+	#challengeModeDimmerContent {
+		position: relative;
+		background-color: #ffffff;
+		padding: 20px;
+		border: 1px solid #cccccc;
+		border-radius: 5px;
+		margin: 20% auto;
+		width: 60%;
+		text-align: center;
+		z-index: 1001;
+	}
+
+    #scoreAndExitButtonHolder {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #challengeModeScoreDisplay {
+        font-size: 20px;
+    }
+</style>
+
+<div id="challengeModeBox">
+    <h4>Challenge mode</h4>
+    <div style="display: grid; grid-template-columns: 240px 150px 80px;">
+        <div>
+            <p>Challenge yourself with exam:</p>
+        </div>
+        <div>
+            <select id="examsDropdown">
+                <option selected disabled hidden value="default">Choose an exam</option>
+            </select>
+        </div>
+        <div>
+            <button onclick="startChallengeMode()">Start!</button>
+            <div id="challengeModeDimmerBackground">
+                <div id="challengeModeDimmerContent">
+                    <div id="scoreAndExitButtonHolder">
+                        <div>
+                            <p id="challengeModeScoreDisplay" align="left">Score: 0</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <button id="challengeModeExitButton" align="right" onclick="stopChallengeMode()">X</button>
+                        </div>
+                    </div>
+                    <h2 id="challengeModeTitle"></h2>
+                    <p>Placeholder.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -27,7 +86,7 @@
         {
             allExams = data;
             data.forEach(exam => {
-                newOption = new Option(exam.name, exam.name);
+                newOption = new Option(exam.name, `${exam.name}Exam`);
                 document.getElementById("examsDropdown").add(newOption, undefined);
             });
         }
@@ -35,4 +94,25 @@
     .catch(error => {
         console.error('Error:', error);
     });
+
+    function startChallengeMode()
+    {
+        const examDropdown = document.getElementById("examsDropdown");
+        const examChosen = examDropdown.options[examDropdown.selectedIndex];
+        if(examChosen.value === "default")
+        {
+            alert("Select an exam to challenge yourself on.");
+            return;
+        }
+
+        var dimmerBackground = document.getElementById("challengeModeDimmerBackground");
+        dimmerBackground.style.display = "block";
+        document.getElementById("challengeModeTitle").innerText = `${examChosen.text} challenge`;
+	}
+
+    function stopChallengeMode()
+    {
+        var dimmerBackground = document.getElementById("challengeModeDimmerBackground");
+		dimmerBackground.style.display = "none";
+	}
 </script>

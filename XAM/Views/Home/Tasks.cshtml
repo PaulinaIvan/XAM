@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Tasks";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div style="display: grid; grid-template-columns: 180px 150px 80px;">
+    <div>
+        <p>Challenge yourself with exam:</p>
+    </div>
+    <div>
+        <select id="examsDropdown">
+            <option selected disabled hidden>Choose an exam</option>
+        </select>
+    </div>
+    <div>
+        <button id="challengeStartButton">Start!</button>
+    </div>
+</div>
+
+<script>
+    var allExams;
+
+    fetch(`/Home/FetchExams`)
+    .then(response => response.json())
+    .then(data => {
+        if (data && Array.isArray(data) && data.length > 0)
+        {
+            allExams = data;
+            data.forEach(exam => {
+                newOption = new Option(exam.name, exam.name);
+                document.getElementById("examsDropdown").add(newOption, undefined);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+</script>

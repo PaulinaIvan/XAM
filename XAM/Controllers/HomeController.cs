@@ -41,6 +41,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult Tasks()
+    {
+        return View();
+    }
+
     public IActionResult Statistics()
     {
         return View();

@@ -55,4 +55,40 @@ public class TasksController : Controller
             return Json(result);
         }
     }
+
+    public IActionResult SetChallengeHighscoreForExam(string examName, int score)
+    {
+        Exam? theExam = _dataHolder.Exams.Find(exam => exam.Name == examName);
+
+        if(theExam == null)
+        {
+            ErrorRecord errorResponse = CreateErrorResponse("NoExamWithName", $"Exam with name {examName} no longer exists.");
+            return Json(errorResponse);
+        }
+        else
+        {
+            if(theExam.ChallengeHighscore < score)
+            {
+                var result = new
+                {
+                    text = $@"New {examName} highscore!
+                    Old highscore: {theExam.ChallengeHighscore}
+                    New highscore: {score}"
+                };
+                theExam.ChallengeHighscore = score;
+                return Json(result);
+            }
+            else
+            {
+                var result = new
+                {
+                    text = 
+                    $@"No new highscore for {examName}...
+                    Score: {score}
+                    Highscore: {theExam.ChallengeHighscore}"
+                };
+                return Json(result);
+            }
+        }
+    }
 }

@@ -66,7 +66,12 @@ public class HomeController : Controller
         var result = new
         {
             lifetimeExams = _dataHolder.LifetimeCreatedExamsCounter,
-            lifetimeFlashcards = _dataHolder.LifetimeCreatedFlashcardsCounter
+            lifetimeFlashcards = _dataHolder.LifetimeCreatedFlashcardsCounter,
+            challengeHighscoresList = _dataHolder.Exams
+                .Where(exam => exam.ChallengeHighscore > 0)
+                .Select(exam => new { name = exam.Name, challengeHighscore = exam.ChallengeHighscore })
+                .ToArray()
+
         };
         return Json(result);
     }

@@ -125,37 +125,88 @@ function createFlashcard(frontTextInput, backTextInput, examNameValue)
     backTextInput.value = '';
 }
 
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) {
+        return text;
+    } else {
+        return text.substring(0, maxLength) + '...';
+    }
+}
+
+function createExpandedTextBox(fullText) {
+    const textBox = document.createElement('div');
+    textBox.classList.add('expanded-text-box');
+    textBox.textContent = fullText;
+
+    textBox.addEventListener('click', function (event) {
+        event.stopPropagation();
+    });
+
+    document.body.appendChild(textBox);
+    document.body.addEventListener('click', function () {
+        textBox.style.display = 'none';
+    });
+
+    return textBox;
+}
+
+let currentlyOpenTextBox = null;
+
 function addFlashcard(frontTextValue, backTextValue, examNameValue) {
+
     const box = document.createElement('div');
     box.classList.add('box');
+
+    const truncatedFrontText = truncateText(frontTextValue, 20);
+    const truncatedBackText = truncateText(backTextValue, 20);
 
     const boxInner = document.createElement('div');
     boxInner.classList.add('box-inner');
 
     const boxFront = document.createElement('div');
     boxFront.classList.add('box-front');
-    boxFront.textContent = frontTextValue;
+    boxFront.textContent = truncatedFrontText;
 
     const boxBack = document.createElement('div');
     boxBack.classList.add('box-back');
-    boxBack.textContent = backTextValue;
+    boxBack.textContent = truncatedBackText;
 
     const deleteButton = document.createElement('button');
     deleteButton.classList.add('delete-button');
+    deleteButton.textContent = "X";
+
+    const moreButton = document.createElement('button');
+    moreButton.classList.add('more-button');
+    moreButton.textContent = "i";
+
+    let isFlipped = false;
 
     deleteButton.addEventListener('click', () => {
-        // Call a function to delete the flashcard here
         deleteFlashcard(examNameValue, box);
     });
 
+    moreButton.addEventListener('click', function (event) {
+        event.stopPropagation();
+        if (currentlyOpenTextBox) {
+            currentlyOpenTextBox.style.display = 'none';
+        }
+
+        const textToShow = isFlipped ? ("Answer:\n" + backTextValue) : ("Question:\n" + frontTextValue);
+        const textBox = createExpandedTextBox(textToShow);
+        textBox.style.display = 'block';
+
+        currentlyOpenTextBox = textBox;
+    });
 
     box.addEventListener('click', () => {
-        boxInner.style.transform = (boxInner.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)');
+        isFlipped = !isFlipped;
+        boxInner.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
     });
 
     boxInner.appendChild(boxFront);
     boxInner.appendChild(boxBack);
     boxInner.appendChild(deleteButton);
+    boxInner.appendChild(moreButton);
     box.appendChild(boxInner);
     document.getElementById(`${examNameValue}Grid`).appendChild(box);
 }

@@ -1,76 +1,11 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="~/css/tasks.css">
+</head>
+
 @{
     ViewData["Title"] = "Tasks";
 }
 <h1>@ViewData["Title"]</h1>
-
-<style>
-    #challengeModeBox {
-        border: 5px solid #E5E5E5;
-        border-radius: 10px;
-        margin-top: 10px;
-        padding: 10px;
-        background-color: #ffffff;
-        z-index: 1;
-	}
-
-	#challengeModeDimmerBackground {
-		display: none;
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.5);
-		z-index: 1000;
-	}
-	
-	#challengeModeDimmerContent {
-		position: fixed;
-        top: 150px;
-        left: 20%;
-		width: 60%;
-		height: auto;
-		background-color: #ffffff;
-		padding: 20px;
-		border: 1px solid #cccccc;
-		border-radius: 5px;
-		text-align: center;
-		z-index: 1001;
-	}
-
-    #scoreAndExitButtonHolder, #answerButtons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-
-    #challengeModeScoreDisplay {
-        font-size: 20px;
-    }
-
-    .flashcardBoxFront, .flashcardBoxBack {
-        margin: auto;
-        width: auto;
-        height: auto;
-        min-height: 100px;
-        border-radius: 10px;
-        margin-top: 10px;
-        padding: 10px;
-    }
-
-    .flashcardBoxFront {
-        background-color: #14213d;
-        border: 5px solid #111b33;
-        color:#ffffff;
-        white-space: pre-line;
-    }
-
-    .flashcardBoxBack {
-        background-color: #FCA311;
-        border: 5px solid #ca820e;
-        color:#000000;
-        white-space: pre-line;
-    }
-</style>
 
 <div id="challengeModeBox">
     <h4>Challenge mode</h4>
@@ -84,7 +19,7 @@
             </select>
         </div>
         <div>
-            <button onclick="startChallengeMode()">Start!</button>
+            <button id="startChallengeButton" onclick="startChallengeMode()">Start!</button>
         </div>
     </div>
 </div>
@@ -106,7 +41,7 @@
             <button id="checkFlashcardAnswerButton" onclick="checkFlashcardAnswer()" style="margin: auto; margin-top: 5px;">Check</button>
             <div id="answerButtons">
                 <button id="guessedButton" onclick="guessedAnswer()">I guessed right!</button>
-                <button id="forgotButton" onclick="forgotAnswer()">I forgot...</button>
+                <button id="forgotButton" onclick="forgotAnswer()">I forgor&#x1F480;...</button>
             </div>
         </div>
         <div id="endScreenHolder">
@@ -115,179 +50,4 @@
     </div>
 </div>
 
-<script>
-    fetch(`/Tasks/FetchExamNames`)
-    .then(response => response.json())
-    .then(allExamNames => {
-        if (allExamNames && Array.isArray(allExamNames.names) && allExamNames.names.length > 0)
-        {
-            allExamNames.names.forEach(examName => {
-                newOption = new Option(examName, `${examName}Exam`);
-                document.getElementById("examsDropdown").add(newOption, undefined);
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-
-    async function getFlashcardsFromExam(examName) {
-        try {
-            const response = await fetch(`/Tasks/FetchFlashcardsOfExam?examName=${examName}`);
-            const data = await response.json();
-
-            if (data.errorCode === "NoFlashcards")
-            {
-                alert(data.errorMessage);
-                return data.errorCode;
-            }
-            else
-            {
-                return data.flashcards;
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    async function setHighscore(examName, score) {
-        try {
-            const response = await fetch(`/Tasks/SetChallengeHighscoreForExam?examName=${examName}&score=${score}`);
-            const data = await response.json();
-
-            if (data.errorCode === "NoExamWithName")
-            {
-                alert(data.errorMessage);
-                return data.errorCode;
-            }
-            else
-            {
-                return data.text;
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    var challengeScore;
-    var currentQuestion;
-    var flashcards;
-    var challengeExamName;
-    async function startChallengeMode()
-    {
-        const examDropdown = document.getElementById("examsDropdown");
-        const examChosen = examDropdown.options[examDropdown.selectedIndex];
-        if(examChosen.value === "default")
-        {
-            alert("Select an exam to challenge yourself on.");
-            return;
-        }
-
-        resetChallengeWindow();
-        flashcards = await getFlashcardsFromExam(examChosen.text);
-        challengeExamName = examChosen.text;
-        if(flashcards === "NoFlashcards")
-        {
-            return;
-        }
-        else
-        {
-            var dimmerBackground = document.getElementById("challengeModeDimmerBackground");
-            dimmerBackground.style.display = "block";
-            document.getElementById("challengeModeTitle").innerText = `${examChosen.text} challenge`;
-            updateChallengeWindow();
-        }
-	}
-
-    function stopChallengeMode()
-    {
-        if(currentQuestion == -1)
-        {
-            closeChallengeMode();
-        }
-        else
-        {
-            currentQuestion = -1;
-            displayEndScreen();
-        }
-	}
-
-    function closeChallengeMode()
-    {
-        var dimmerBackground = document.getElementById("challengeModeDimmerBackground");
-		dimmerBackground.style.display = "none";
-	}
-
-    async function displayEndScreen()
-    {
-        document.getElementById("gameFieldHolder").style.display = "none";
-        document.getElementById("endScreenHolder").style.display = "block";
-
-        const endMessage = await setHighscore(challengeExamName, challengeScore);
-
-        document.getElementById("endMessageDiv").innerText = endMessage;
-    }
-
-    function resetChallengeWindow()
-    {
-        challengeScore = 0;
-        currentQuestion = 0;
-        flashcards = null;
-        examChosen = null;
-        updateChallengeScore(0);
-
-        document.getElementById("gameFieldHolder").style.display = "block";
-        document.getElementById("endScreenHolder").style.display = "none";
-    }
-
-    function updateChallengeWindow()
-    {
-        var flashcardBox = document.getElementById("flashcardBox");
-        if(flashcardBox.classList.contains("flashcardBoxBack"))
-        {
-            flashcardBox.classList.remove("flashcardBoxBack");
-            flashcardBox.classList.add("flashcardBoxFront");
-        }
-        document.getElementById("checkFlashcardAnswerButton").style.display = "block";
-        document.getElementById("answerButtons").style.display = "none";
-
-        if(currentQuestion < flashcards.length)
-        {
-            flashcardBox.innerText = `Q: ${flashcards[currentQuestion].frontText}`;
-        }
-        else
-        {
-            stopChallengeMode();
-        }
-    }
-
-    function checkFlashcardAnswer()
-    {
-        flashcardBox.classList.remove("flashcardBoxFront");
-        flashcardBox.classList.add("flashcardBoxBack");
-
-        flashcardBox.innerText = `A: ${flashcards[currentQuestion].backText}`;
-
-        document.getElementById("checkFlashcardAnswerButton").style.display = 'none';
-        document.getElementById("answerButtons").style.display = 'block';
-    }
-
-    function guessedAnswer()
-    {
-        challengeScore += 1;
-        updateChallengeScore(challengeScore);
-
-        ++currentQuestion;
-        updateChallengeWindow();
-    }
-
-    function forgotAnswer()
-    {
-        stopChallengeMode();
-    }
-
-    function updateChallengeScore(score)
-    {
-        document.getElementById("challengeModeScoreDisplay").innerText = `Score: ${score}`;
-    }
-</script>
+<script src="~/js/tasks.js"></script>

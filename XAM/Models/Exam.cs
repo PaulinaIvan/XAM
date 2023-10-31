@@ -4,6 +4,7 @@ public class Exam : IComparable<Exam>
     public string Name { get { return NameField; } set { NameField = value; ValidNameCheck(value); } }
     public DateTime Date { get; set; }
     public List<Flashcard> Flashcards { get; set; } // List of flashcards
+    public int ChallengeHighscore { get; set; } = 0;
 
     public Exam(string name, DateTime date)
     {

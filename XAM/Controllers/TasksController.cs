@@ -15,7 +15,7 @@ public class TasksController : Controller
         _dataHolder = dataHolder;
     }
 
-    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
+    static ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
     {
         ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
         return ErrorResponse;
@@ -48,6 +48,7 @@ public class TasksController : Controller
         }
         else
         {
+            StructShuffle(flashcards);
             var result = new
             {
                 flashcards
@@ -89,6 +90,19 @@ public class TasksController : Controller
                 };
                 return Json(result);
             }
+        }
+    }
+
+    // TODO: Add another valid constraint later. (Possibly change Flashcards struct into a class inside Exam.cs)
+    static void StructShuffle<T>(List<T> list) where T : struct // 2. Create generic method, event or delegate; define at least 2 generic constraints
+    {
+        Random random = new();
+
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int randomIndex = random.Next(0, i + 1);
+            
+            (list[randomIndex], list[i]) = (list[i], list[randomIndex]);
         }
     }
 }

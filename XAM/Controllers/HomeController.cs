@@ -2,6 +2,9 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using XAM.Models;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace XAM.Controllers;
 
@@ -50,6 +53,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult Cocktail()
+    {
+        return View();
+    }
+
     public IActionResult FetchExams()
     {
         List<Exam> correctlyNamedExams = _dataHolder.Exams.Where(exam => exam.Name.IsMadeOfLettersNumbersAndSpaces()).ToList();
@@ -58,6 +66,35 @@ public class HomeController : Controller
         // List<Exam> correctlyNamedExams = (from exam in _dataHolder.Exams where exam.Name.IsMadeOfLettersNumbersAndSpaces() select exam).ToList();
 
         return Json(correctlyNamedExams);
+    }
+
+        [HttpGet]
+    public async Task<IActionResult> GetRandomCocktail()
+    {
+        try
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                string apiUrl = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
+
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(jsonContent);
+                    return Content(jsonContent, "application/json");
+                }
+                else
+                {
+                    return BadRequest("API request failed: " + response.ReasonPhrase);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while fetching data from the API.", error = ex.Message });
+        }
     }
 
     public IActionResult FetchStatistics()

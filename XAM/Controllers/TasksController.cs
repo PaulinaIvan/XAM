@@ -41,7 +41,7 @@ public class TasksController : Controller
     {
         List<Flashcard>? flashcards = _dataHolder.Exams.Find(exam => exam.Name == examName)?.Flashcards;
 
-        if(flashcards == null || flashcards.Count == 0)
+        if (flashcards == null || flashcards.Count == 0)
         {
             ErrorRecord errorResponse = CreateErrorResponse("NoFlashcards", $"No flashcards for exam {examName} found.");
             return Json(errorResponse);
@@ -61,14 +61,14 @@ public class TasksController : Controller
     {
         Exam? theExam = _dataHolder.Exams.Find(exam => exam.Name == examName);
 
-        if(theExam == null)
+        if (theExam == null)
         {
             ErrorRecord errorResponse = CreateErrorResponse("NoExamWithName", $"Exam with name {examName} no longer exists.");
             return Json(errorResponse);
         }
         else
         {
-            if(theExam.ChallengeHighscore < score)
+            if (theExam.ChallengeHighscore < score)
             {
                 var result = new
                 {
@@ -83,7 +83,7 @@ public class TasksController : Controller
             {
                 var result = new
                 {
-                    text = 
+                    text =
                     $@"No new highscore for {examName}...
                     Score: {score}
                     Highscore: {theExam.ChallengeHighscore}"
@@ -101,7 +101,7 @@ public class TasksController : Controller
         for (int i = list.Count - 1; i > 0; i--)
         {
             int randomIndex = random.Next(0, i + 1);
-            
+
             (list[randomIndex], list[i]) = (list[i], list[randomIndex]);
         }
     }

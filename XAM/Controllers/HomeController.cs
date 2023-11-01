@@ -112,12 +112,6 @@ public class HomeController : Controller
         return Json(result);
     }
 
-    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
-    {
-        ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
-        return ErrorResponse;
-    }
-
     public IActionResult DeleteExam(string examName)
     {
         Exam? examToDelete = _dataHolder.Exams.Find(exam => exam.Name == examName);
@@ -130,6 +124,12 @@ public class HomeController : Controller
         {
             return BadRequest("Exam not found.");
         }
+    }
+
+    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
+    {
+        ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
+        return ErrorResponse;
     }
 
     public IActionResult CreateFlashcard(string frontText, string backText, string examName)

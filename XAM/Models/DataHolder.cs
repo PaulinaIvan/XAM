@@ -1,3 +1,5 @@
+namespace XAM.Models;
+
 public class DataHolder
 {
     public List<Exam> Exams { get; set; } = new();

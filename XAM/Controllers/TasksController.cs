@@ -1,24 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using XAM.Models;
+using static XAM.Models.HelperClass;
 
 namespace XAM.Controllers;
 
 public class TasksController : Controller
 {
-    private readonly ILogger<TasksController> _logger;
     private readonly DataHolder _dataHolder;
 
-    public record ErrorRecord(string ErrorCode, string ErrorMessage);
-
-    public TasksController(ILogger<TasksController> logger, DataHolder dataHolder)
+    public TasksController(DataHolder dataHolder)
     {
-        _logger = logger;
         _dataHolder = dataHolder;
-    }
-
-    static ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
-    {
-        ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
-        return ErrorResponse;
     }
 
     public IActionResult Tasks()
@@ -48,7 +40,7 @@ public class TasksController : Controller
         }
         else
         {
-            StructShuffle(flashcards);
+            Shuffle(flashcards);
             var result = new
             {
                 flashcards
@@ -93,8 +85,7 @@ public class TasksController : Controller
         }
     }
 
-    // TODO: Add another valid constraint later. (Possibly change Flashcards struct into a class inside Exam.cs)
-    static void StructShuffle<T>(List<T> list) where T : struct // 2. Create generic method, event or delegate; define at least 2 generic constraints
+    static void Shuffle<T>(List<T> list) where T : class, IComparable<T> // 2. Create generic method, event or delegate; define at least 2 generic constraints
     {
         Random random = new();
 

@@ -1,21 +1,23 @@
-using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using XAM.Models;
+using static XAM.Models.HelperClass;
 
 namespace XAM.Controllers;
 
-public class ExamController : Controller
+public class PreparationController : Controller
 {
-    private readonly ILogger<ExamController> _logger;
     private readonly DataHolder _dataHolder;
 
-    public ExamController(ILogger<ExamController> logger, DataHolder dataHolder)
+    public PreparationController(DataHolder dataHolder)
     {
-        _logger = logger;
         _dataHolder = dataHolder;
     }
-    public record ErrorRecord(string ErrorCode, string ErrorMessage);
+
+    public IActionResult Preparation()
+    {
+        return View();
+    }
 
     public IActionResult FetchExams()
     {
@@ -27,7 +29,7 @@ public class ExamController : Controller
         return Json(correctlyNamedExams);
     }
 
-     public IActionResult CreateExam(string name, string date)
+    public IActionResult CreateExam(string name, string date)
     {
         if (!name.IsMadeOfLettersNumbersAndSpaces())
         {
@@ -77,7 +79,67 @@ public class ExamController : Controller
             return BadRequest("Exam not found.");
         }
     }
-    
+
+    public IActionResult CreateFlashcard(string frontText, string backText, string examName)
+    {
+        try
+        {
+            Exam? exam = _dataHolder.Exams.Find(exam => exam.Name == examName);
+            if (exam == null)
+            {
+                return BadRequest("Exam not found.");
+            }
+
+            Flashcard flashcard = new Flashcard(frontText, backText);
+            exam.Flashcards.Add(flashcard);
+
+            ++_dataHolder.LifetimeCreatedFlashcardsCounter;
+
+            int index = exam.Flashcards.IndexOf(flashcard);
+
+            var result = new
+            {
+                FrontText = frontText,
+                BackText = backText,
+                ExamName = examName,
+                Index = index
+            };
+            return Json(result);
+        }
+        catch
+        {
+            Console.WriteLine("Error.");
+            return BadRequest("Error.");
+        }
+    }
+
+    [HttpDelete]
+    public IActionResult DeleteFlashcard(string examName, int flashcardIndex)
+    {
+        try
+        {
+            Exam? exam = _dataHolder.Exams.Find(exam => exam.Name == examName);
+            if (exam == null)
+            {
+                return BadRequest("Exam not found.");
+            }
+
+            if (flashcardIndex < 0 || flashcardIndex >= exam.Flashcards.Count)
+            {
+                return BadRequest("Flashcard not found.");
+            }
+
+            exam.Flashcards.RemoveAt(flashcardIndex);
+
+            return Ok();
+        }
+        catch
+        {
+            Console.WriteLine("Error.");
+            return BadRequest("Error.");
+        }
+    }
+
     [HttpGet]
     public IActionResult DownloadAllData()
     {
@@ -125,11 +187,4 @@ public class ExamController : Controller
             return BadRequest(new { message = "No file was selected for upload." });
         }
     }
-
-    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
-    {
-        ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
-        return ErrorResponse;
-    }
-
 }

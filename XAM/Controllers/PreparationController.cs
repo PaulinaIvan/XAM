@@ -19,9 +19,11 @@ public class PreparationController : Controller
         return View();
     }
 
+    delegate bool StringChecker(string s); // 3. Delegates usage
+    readonly StringChecker checkForLetterNumbersAndSpaces = s => s.IsMadeOfLettersNumbersAndSpaces(); // 5. Lambda expressions usage
     public IActionResult FetchExams()
     {
-        List<Exam> correctlyNamedExams = _dataHolder.Exams.Where(exam => exam.Name.IsMadeOfLettersNumbersAndSpaces()).ToList();
+        List<Exam> correctlyNamedExams = _dataHolder.Exams.Where(exam => checkForLetterNumbersAndSpaces(exam.Name)).ToList();
 
         // (Same thing as above, but with queries)
         // List<Exam> correctlyNamedExams = (from exam in _dataHolder.Exams where exam.Name.IsMadeOfLettersNumbersAndSpaces() select exam).ToList();

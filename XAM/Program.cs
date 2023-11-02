@@ -1,9 +1,9 @@
 using XAM.Models;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DataHolder>();
+builder.Services.AddScoped<ErrorViewModel>();
 
 var app = builder.Build();
 

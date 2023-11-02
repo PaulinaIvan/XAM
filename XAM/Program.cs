@@ -4,6 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DataHolder>();
 
+// Register CocktailGenerator as a hosted service
+builder.Services.AddHostedService<CocktailGenerator>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,4 +28,13 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
 app.Run();
+
+// Get an instance of the CocktailGenerator
+var cocktailGenerator = app.Services.GetRequiredService<CocktailGenerator>();
+
+// Start the CocktailGenerator explicitly
+cocktailGenerator.StartAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+

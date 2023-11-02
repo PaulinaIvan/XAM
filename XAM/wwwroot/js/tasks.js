@@ -145,6 +145,7 @@ function updateChallengeWindow()
 
 function checkFlashcardAnswer()
 {
+    var flashcardBox = document.getElementById("flashcardBox");
     flashcardBox.classList.remove("flashcardBoxFront");
     flashcardBox.classList.add("flashcardBoxBack");
 

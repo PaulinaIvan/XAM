@@ -1,51 +1,20 @@
-﻿using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using XAM.Models;
+using static XAM.Models.HelperClass;
 
 namespace XAM.Controllers;
 
-public class HomeController : Controller
+public class PreparationController : Controller
 {
-    // Requirements not achieved:
-    // 1. Relational database is used for storing data
-    // 3. Delegates usage
-    // 4. Create at least 1 exception type and throw it; meaningfully deal with it; (most of the exceptions are logged to a file or a server)
-    // 5. Lambda expressions usage
-    // 6. Usage of threading via Thread class
-    // 7. Usage of async/await
-    // 8. Use at least 1 concurrent collection or Monitor
-    // 9. Regex usage
-    // 10. No instances are created using 'new' keyword, dependency injection is used everywhere
-    // 11. Unit and integration tests coverage at least 20%
-
-    private readonly ILogger<HomeController> _logger;
     private readonly DataHolder _dataHolder;
 
-    public record ErrorRecord(string ErrorCode, string ErrorMessage);
-
-    public HomeController(ILogger<HomeController> logger, DataHolder dataHolder)
+    public PreparationController(DataHolder dataHolder)
     {
-        _logger = logger;
         _dataHolder = dataHolder;
     }
 
-    public IActionResult Index()
-    {
-        return View();
-    }
-
     public IActionResult Preparation()
-    {
-        return View();
-    }
-
-    public IActionResult Statistics()
-    {
-        return View();
-    }
-
-    public IActionResult About()
     {
         return View();
     }
@@ -58,21 +27,6 @@ public class HomeController : Controller
         // List<Exam> correctlyNamedExams = (from exam in _dataHolder.Exams where exam.Name.IsMadeOfLettersNumbersAndSpaces() select exam).ToList();
 
         return Json(correctlyNamedExams);
-    }
-
-    public IActionResult FetchStatistics()
-    {
-        var result = new
-        {
-            lifetimeExams = _dataHolder.LifetimeCreatedExamsCounter,
-            lifetimeFlashcards = _dataHolder.LifetimeCreatedFlashcardsCounter,
-            challengeHighscoresList = _dataHolder.Exams
-                .Where(exam => exam.ChallengeHighscore > 0)
-                .Select(exam => new { name = exam.Name, challengeHighscore = exam.ChallengeHighscore })
-                .ToArray()
-
-        };
-        return Json(result);
     }
 
     public IActionResult CreateExam(string name, string date)
@@ -110,12 +64,6 @@ public class HomeController : Controller
             Date = newExam.Date.ToString("yyyy-MM-dd"),
         };
         return Json(result);
-    }
-
-    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
-    {
-        ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
-        return ErrorResponse;
     }
 
     public IActionResult DeleteExam(string examName)
@@ -238,12 +186,5 @@ public class HomeController : Controller
         {
             return BadRequest(new { message = "No file was selected for upload." });
         }
-    }
-
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

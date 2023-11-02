@@ -1,3 +1,5 @@
+namespace XAM.Models;
+
 public class Exam : IComparable<Exam>
 {
     private string NameField;
@@ -13,7 +15,7 @@ public class Exam : IComparable<Exam>
         Flashcards = new List<Flashcard>(); // Initialize the list of flashcards
     }
 
-    private void ValidNameCheck(string newName)
+    private static void ValidNameCheck(string newName)
     {
         try
         {
@@ -34,17 +36,5 @@ public class Exam : IComparable<Exam>
     public void DeleteFlashcard(Flashcard flashcard)
     {
         Flashcards.Remove(flashcard);
-    }
-}
-
-public struct Flashcard
-{
-    public string FrontText { get; set; }
-    public string BackText { get; set; }
-
-    public Flashcard(string frontText, string backText)
-    {
-        FrontText = frontText;
-        BackText = backText;
     }
 }

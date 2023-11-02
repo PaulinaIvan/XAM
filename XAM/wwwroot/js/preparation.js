@@ -1,5 +1,4 @@
-
-fetch(`/Home/FetchExams`)
+fetch(`/Preparation/FetchExams`)
 .then(response => response.json())
 .then(data => {
     if (data && Array.isArray(data) && data.length > 0)
@@ -29,7 +28,7 @@ function createExam()
 
     if(!document.getElementById(`${examNameValue}Grid`))
     {
-        fetch(`/Home/CreateExam?name=${examNameValue}&date=${examDateValue}`)
+        fetch(`/Preparation/CreateExam?name=${examNameValue}&date=${examDateValue}`)
             .then(response => response.json())
             .then(data => {
                 if(data.errorCode === 'BadName')
@@ -112,7 +111,7 @@ function addExam(examNameValue, dateStringValue)
 
 function createFlashcard(frontTextInput, backTextInput, examNameValue)
 {
-    fetch(`/Home/CreateFlashcard?frontText=${frontTextInput.value}&backText=${backTextInput.value}&examName=${examNameValue}`)
+    fetch(`/Preparation/CreateFlashcard?frontText=${frontTextInput.value}&backText=${backTextInput.value}&examName=${examNameValue}`)
         .then(response => response.json())
         .then(data => {
             addFlashcard(data.frontText, data.backText, data.examName);
@@ -224,7 +223,7 @@ function deleteFlashcard(examNameValue, flashcardElement) {
 
         // Send an AJAX request to delete the flashcard from the server
         const xhr = new XMLHttpRequest();
-        xhr.open('DELETE', `/Home/DeleteFlashcard?examName=${examNameValue}&flashcardIndex=${flashcardIndex}`);
+        xhr.open('DELETE', `/Preparation/DeleteFlashcard?examName=${examNameValue}&flashcardIndex=${flashcardIndex}`);
         xhr.send();
     }
 }
@@ -232,7 +231,7 @@ function deleteFlashcard(examNameValue, flashcardElement) {
 function deleteExam(examNameValue)
 {
     const examBox = document.getElementById(`${examNameValue}Id`);
-    fetch(`/Home/DeleteExam?examName=${examNameValue}`)
+    fetch(`/Preparation/DeleteExam?examName=${examNameValue}`)
         .then(response => response.json())
         .then(data => {
             examBox.remove();
@@ -289,7 +288,7 @@ function clamp(value, min, max)
 
 // Download
 document.getElementById('downloadButton').addEventListener('click', function () {
-    fetch('/Home/DownloadAllData')
+    fetch('/Preparation/DownloadAllData')
         .then(response => {
             if (response.ok) {
                 return response.blob();
@@ -318,7 +317,7 @@ if (file) {
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('/Home/UploadDataFile', {
+    fetch('/Preparation/UploadDataFile', {
         method: 'POST',
         body: formData
     })

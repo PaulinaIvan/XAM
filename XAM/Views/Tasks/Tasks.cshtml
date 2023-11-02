@@ -1,0 +1,53 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="~/css/tasks.css">
+</head>
+
+@{
+    ViewData["Title"] = "Tasks";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div id="challengeModeBox">
+    <h4>Challenge mode</h4>
+    <div style="display: grid; grid-template-columns: 240px 150px 80px;">
+        <div>
+            <p>Challenge yourself with exam:</p>
+        </div>
+        <div>
+            <select id="examsDropdown">
+                <option selected disabled hidden value="default">Choose an exam</option>
+            </select>
+        </div>
+        <div>
+            <button id="startChallengeButton" onclick="startChallengeMode()">Start!</button>
+        </div>
+    </div>
+</div>
+<div id="challengeModeDimmerBackground">
+    <div id="challengeModeDimmerContent">
+        <div id="scoreAndExitButtonHolder">
+            <div>
+                <p id="challengeModeScoreDisplay" align="left">Score: 0</p>
+            </div>
+            <div style="text-align: right;">
+                <button id="challengeModeExitButton" align="right" onclick="stopChallengeMode()">X</button>
+            </div>
+        </div>
+        <h2 id="challengeModeTitle"></h2>
+        <div id="gameFieldHolder">
+            <p>Do you know the answer?</p>
+            <div id="flashcardBox" class="flashcardBoxFront"></div>
+
+            <button id="checkFlashcardAnswerButton" onclick="checkFlashcardAnswer()" style="margin: auto; margin-top: 5px;">Check</button>
+            <div id="answerButtons">
+                <button id="guessedButton" onclick="guessedAnswer()">I guessed right!</button>
+                <button id="forgotButton" onclick="forgotAnswer()">I forgor&#x1F480;...</button>
+            </div>
+        </div>
+        <div id="endScreenHolder">
+            <p id="endMessageDiv"></p>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/tasks.js"></script>

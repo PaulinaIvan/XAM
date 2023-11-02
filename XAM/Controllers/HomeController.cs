@@ -9,7 +9,6 @@ public class HomeController : Controller
 {
     // Requirements not achieved:
     // 1. Relational database is used for storing data
-    // 2. Create generic method, event or delegate; define at least 2 generic constraints
     // 3. Delegates usage
     // 4. Create at least 1 exception type and throw it; meaningfully deal with it; (most of the exceptions are logged to a file or a server)
     // 5. Lambda expressions usage
@@ -66,7 +65,12 @@ public class HomeController : Controller
         var result = new
         {
             lifetimeExams = _dataHolder.LifetimeCreatedExamsCounter,
-            lifetimeFlashcards = _dataHolder.LifetimeCreatedFlashcardsCounter
+            lifetimeFlashcards = _dataHolder.LifetimeCreatedFlashcardsCounter,
+            challengeHighscoresList = _dataHolder.Exams
+                .Where(exam => exam.ChallengeHighscore > 0)
+                .Select(exam => new { name = exam.Name, challengeHighscore = exam.ChallengeHighscore })
+                .ToArray()
+
         };
         return Json(result);
     }

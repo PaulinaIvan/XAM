@@ -29,6 +29,7 @@ public class CocktailController : Controller
                 {
                     string jsonContent = await response.Content.ReadAsStringAsync();
                     _dataHolder.TodaysCocktail = jsonContent;
+                    Console.WriteLine(jsonContent);
 
                     return NoContent();
                 }
@@ -43,6 +44,4 @@ public class CocktailController : Controller
             return StatusCode(500, new { message = "An error occurred while fetching data from the API.", error = ex.Message });
         }
     }
-
-
 }

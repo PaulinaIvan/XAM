@@ -5,42 +5,41 @@ using Microsoft.Extensions.Hosting;
 using XAM.Controllers;
 using XAM.Models;
 
-
 public class CocktailGenerator : BackgroundService
 {
     private readonly CocktailController _cocktailController;
-    private readonly DataHolder _dataHolder;
 
-    public CocktailGenerator(CocktailController cocktailController, DataHolder dataHolder)
+    public CocktailGenerator(CocktailController cocktailController)
     {
         _cocktailController = cocktailController;
-        _dataHolder = dataHolder;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken) // 7. Usage of async/await
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _cocktailController.GetRandomCocktail(); //Generate a cocktail at startup
-        Console.WriteLine("CocktailGenerator is running.");
-
         while (!stoppingToken.IsCancellationRequested)
         {
+
+            //Console.WriteLine("CocktailGenerator is running.");
+            await _cocktailController.GetRandomCocktail();
+            
             var now = DateTime.Now;
-            var next4PM = now.Date.AddHours(16); 
+            var next4PM = now.Date.AddHours(16);
+
             if (now >= next4PM)
             {
                 next4PM = next4PM.AddDays(1); // Move to the next day if it's already past 4 PM today
             }
 
             var delay = next4PM - now;
+
+            // Delay until the next 4 PM or until cancellation is requested
             await Task.Delay(delay, stoppingToken);
 
-            Console.WriteLine("It's 4 PM, time to generate a cocktail!");
-            await _cocktailController.GetRandomCocktail();
+            if (!stoppingToken.IsCancellationRequested)
+            {
+                Console.WriteLine("It's 4 PM, time to generate a cocktail!");
+                await _cocktailController.GetRandomCocktail();
+            }
         }
-    }
-
-    public override Task StartAsync(CancellationToken cancellationToken)
-    {
-        return ExecuteAsync(cancellationToken);
     }
 }

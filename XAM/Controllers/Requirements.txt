@@ -7,7 +7,7 @@ Requirements not achieved:
 6. Usage of threading via Thread class
 7. Usage of async/await
 8. Use at least 1 concurrent collection or Monitor
-9. Regex usage
+-9. Regex usage
 10. No instances are created using 'new' keyword, dependency injection is used everywhere
 11. Unit and integration tests coverage at least 20%
 // (Place "-" before requirement if it is done.)

@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace XAM.Models;
 
 public static class HelperClass
@@ -5,7 +7,11 @@ public static class HelperClass
     // Returns true if string contains only letters and spaces.
     public static bool IsMadeOfLettersNumbersAndSpaces(this string str)
     {
-        return !string.IsNullOrEmpty(str) && str.All(c => char.IsLetterOrDigit(c) || c == ' ');
+        if (string.IsNullOrEmpty(str))
+            return false;
+
+        string pattern = @"^[\p{L}\p{N} ]+$"; // Letters and numbers from any language, and spaces pattern (at least one character)
+        return Regex.IsMatch(str, pattern); // 9. Regex usage
     }
 
     // For easier error messaging to frontend.

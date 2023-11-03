@@ -16,7 +16,6 @@ public class PreparationController : Controller
 
     public IActionResult Preparation()
     {
-        "".IsValidExamName();
         return View();
     }
 

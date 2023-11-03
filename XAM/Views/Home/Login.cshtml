@@ -52,7 +52,8 @@
             return;
         }
         localStorage.setItem(username, '{"Exams":[],"LifetimeCreatedExamsCounter":0,"LifetimeCreatedFlashcardsCounter":0}');
-        console.log(localStorage.getItem(username));
+
+        userLogin(username);
     }
 
     function loadData(file) {
@@ -89,5 +90,5 @@
     document.getElementById("user").innerText = sessionStorage.getItem("currentUser");
 
 
-    src="~/js/preparation.js"
+    //src="~/js/preparation.js"
 </script>

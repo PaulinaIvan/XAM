@@ -16,11 +16,12 @@ public class PreparationController : Controller
 
     public IActionResult Preparation()
     {
+        "".IsValidExamName();
         return View();
     }
 
     delegate bool StringChecker(string s); // 3. Delegates usage
-    readonly StringChecker checkForLetterNumbersAndSpaces = s => s.IsMadeOfLettersNumbersAndSpaces(); // 5. Lambda expressions usage
+    readonly StringChecker checkForLetterNumbersAndSpaces = s => s.IsValidExamName(); // 5. Lambda expressions usage
     public IActionResult FetchExams()
     {
         List<Exam> correctlyNamedExams = _dataHolder.Exams.Where(exam => checkForLetterNumbersAndSpaces(exam.Name)).ToList();
@@ -33,7 +34,7 @@ public class PreparationController : Controller
 
     public IActionResult CreateExam(string name, string date)
     {
-        if (!name.IsMadeOfLettersNumbersAndSpaces())
+        if (!name.IsValidExamName())
         {
             string error = "Invalid exam name.";
             Console.WriteLine(error);
@@ -80,12 +81,6 @@ public class PreparationController : Controller
         {
             return BadRequest("Exam not found.");
         }
-    }
-
-    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
-    {
-        ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
-        return ErrorResponse;
     }
 
     public IActionResult CreateFlashcard(string frontText, string backText, string examName)

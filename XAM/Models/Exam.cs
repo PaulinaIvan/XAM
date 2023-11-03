@@ -19,7 +19,7 @@ public class Exam : IComparable<Exam>
     {
         try
         {
-            if (!newName.IsMadeOfLettersNumbersAndSpaces() || newName == "")
+            if (!newName.IsValidExamName() || newName == "")
                 throw new Exception();
         }
         catch (Exception e)

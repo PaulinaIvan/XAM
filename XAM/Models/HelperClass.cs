@@ -5,13 +5,21 @@ namespace XAM.Models;
 public static class HelperClass
 {
     // Returns true if string contains only letters and spaces.
-    public static bool IsMadeOfLettersNumbersAndSpaces(this string str)
+    public static bool IsValidExamName(this string str)
     {
-        if (string.IsNullOrEmpty(str))
-            return false;
+        try
+        {
+            if (string.IsNullOrEmpty(str))
+                throw new InvalidExamNameException("Null or empty exam name found in backend!");
 
-        string pattern = @"^[\p{L}\p{N} ]+$"; // Letters and numbers from any language, and spaces pattern (at least one character)
-        return Regex.IsMatch(str, pattern); // 9. Regex usage
+            string pattern = @"^[\p{L}\p{N} ]+$"; // Letters and numbers from any language, and spaces pattern (at least one character)
+            return Regex.IsMatch(str, pattern); // 9. Regex usage
+        }
+        catch (InvalidExamNameException ex) // 4. Create at least 1 exception type and throw it; meaningfully deal with it; (most of the exceptions are logged to a file or a server)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return false;
+        }
     }
 
     // For easier error messaging to frontend.

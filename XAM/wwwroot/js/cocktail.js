@@ -3,8 +3,28 @@ document.getElementById('cocktailButton').addEventListener('click', function () 
     .then(response => response.json())
     .then(data => {
         if (data && data.drinks && data.drinks.length > 0) {
-            const cocktailName = data.drinks[0].strDrink;
-            document.getElementById('cocktailName').textContent = `Cocktail Name: ${cocktailName}`;
+            const cocktailData = data.drinks[0];
+
+            document.getElementById('cocktailName').textContent = `Cocktail Name: ${cocktailData.strDrink}`;
+
+            const cocktailImage = document.getElementById('cocktailImage');
+            cocktailImage.src = cocktailData.strDrinkThumb;
+            cocktailImage.alt = `Image of ${cocktailData.strDrink}`;
+
+            const ingredientsList = document.getElementById('ingredientsList');
+            ingredientsList.innerHTML = '';
+            for (let i = 1; i <= 15; i++) {
+                const ingredient = cocktailData[`strIngredient${i}`];
+                const measure = cocktailData[`strMeasure${i}`];
+                if (ingredient && measure) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${measure} ${ingredient}`;
+                    ingredientsList.appendChild(listItem);
+                }
+            }
+            document.getElementById('instructions').textContent = cocktailData.strInstructions;
+            const cocktailCard = document.querySelector('.cocktail-card');
+            cocktailCard.style.display = 'block';
         } else {
             console.error('Invalid data format received from the server.');
         }

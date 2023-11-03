@@ -29,7 +29,6 @@ public class CocktailController : Controller
                 {
                     string jsonContent = await response.Content.ReadAsStringAsync();
                     _dataHolder.TodaysCocktail = jsonContent;
-                    Console.WriteLine(jsonContent);
 
                     return NoContent();
                 }

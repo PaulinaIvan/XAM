@@ -82,6 +82,12 @@ public class PreparationController : Controller
         }
     }
 
+    ErrorRecord CreateErrorResponse(string ErrorCode, string ErrorMessage = "Unknown error.")
+    {
+        ErrorRecord ErrorResponse = new(ErrorCode, ErrorMessage);
+        return ErrorResponse;
+    }
+
     public IActionResult CreateFlashcard(string frontText, string backText, string examName)
     {
         try

@@ -51,6 +51,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult Login()
+    {
+        return View();
+    }
+
     public IActionResult FetchExams()
     {
         List<Exam> correctlyNamedExams = _dataHolder.Exams.Where(exam => exam.Name.IsMadeOfLettersNumbersAndSpaces()).ToList();
@@ -126,6 +131,12 @@ public class HomeController : Controller
         {
             return BadRequest("Exam not found.");
         }
+    }
+
+    public IActionResult DeleteAllExams()
+    {
+        _dataHolder.Exams.Clear();
+        return Json("All exams have been deleted.");
     }
 
     public IActionResult CreateFlashcard(string frontText, string backText, string examName)
@@ -235,7 +246,6 @@ public class HomeController : Controller
             return BadRequest(new { message = "No file was selected for upload." });
         }
     }
-
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

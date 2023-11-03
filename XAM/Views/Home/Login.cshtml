@@ -1,0 +1,93 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="text-center">
+    <h1>Login</h1>
+    <input type="text" name="userName" />
+    <button onclick="userLogin(document.getElementsByName('userName')[0].value)">Log in</button>
+</div>
+<div class="text-center">
+    <div style="margin-top: 20px;">
+        <p>Are You a new user?</p>
+    </div>
+    <div style="margin-top: -20px;">
+        <input type="text" name="newUserName" />
+        <button onClick="newUser()">Sign Up!</button>
+    </div>
+</div>
+<div style="text-align: right;">
+    <div>User:</div>
+    <div id="user"></div>
+</div>
+
+<script>
+    function userLogin(username) {
+        if(localStorage.getItem(username) === null) {
+            alert("user does not exist");
+        }
+        else {
+            fetch('/Home/DeleteAllExams', { method: 'POST',});
+
+            //load user
+            sessionStorage.setItem("currentUser",username);
+
+            jsonString = localStorage.getItem(username);
+
+            const blob = new Blob([jsonString], {type: 'application/json'});
+            const file = new File([blob], 'data.json', {type: 'application/json'});
+
+            loadData(file);
+        }
+        document.getElementById("user").innerText = sessionStorage.getItem("currentUser");
+    }
+    function newUser() {
+        var username = document.getElementsByName("newUserName")[0].value
+        if(!username || /\s/g.test(username) > 0) {
+            alert("Invalid username");
+            return;
+        }
+        if(localStorage.getItem(username) !== null) {
+            alert("Username already in use");
+            return;
+        }
+        localStorage.setItem(username, '{"Exams":[],"LifetimeCreatedExamsCounter":0,"LifetimeCreatedFlashcardsCounter":0}');
+        console.log(localStorage.getItem(username));
+    }
+
+    function loadData(file) {
+        if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch('/Home/UploadDataFile', {
+                method: 'POST',
+                body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.list && Array.isArray(data.list)) {
+
+                        data.list.forEach(exam => {
+                            addExam(exam.name, exam.date.substring(0, 10));
+                            exam.flashcards.forEach(flashcard => {
+                                addFlashcard(flashcard.frontText, flashcard.backText, exam.name);
+                            });
+                        });
+                    }
+                    else {
+                        console.error('Invalid data format received from the server.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            else {
+                alert('Failed to login');
+            }
+    }
+    
+    document.getElementById("user").innerText = sessionStorage.getItem("currentUser");
+
+
+    src="~/js/preparation.js"
+</script>

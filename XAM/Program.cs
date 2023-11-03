@@ -30,6 +30,7 @@ app.MapControllerRoute(
     pattern: "{controller=Other}/{action=Index}/{id?}");
 
 
+
 app.Run();
 
 // Get an instance of the CocktailGenerator

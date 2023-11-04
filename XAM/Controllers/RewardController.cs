@@ -17,6 +17,10 @@ public class RewardController : Controller
         return View();
     }
 
+    public bool isEligibleForReward()
+    {
+        return _dataHolder.TodaysAchievements.ChallengesTaken >= 2 && _dataHolder.TodaysAchievements.HighscoresBeaten >= 1;
+    }
 
     [HttpGet]
     public IActionResult FetchCocktail()

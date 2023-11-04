@@ -59,6 +59,7 @@ public class PreparationController : Controller
 
         _dataHolder.Exams.Add(newExam);
         ++_dataHolder.LifetimeCreatedExamsCounter;
+        ++_dataHolder.TodaysAchievements.ExamsCreated;
 
         var result = new
         {
@@ -96,6 +97,7 @@ public class PreparationController : Controller
             exam.Flashcards.Add(flashcard);
 
             ++_dataHolder.LifetimeCreatedFlashcardsCounter;
+            ++_dataHolder.TodaysAchievements.FlashcardsCreated;
 
             int index = exam.Flashcards.IndexOf(flashcard);
 

@@ -8,10 +8,12 @@ using XAM.Models;
 public class CocktailGenerator : BackgroundService
 {
     private readonly CocktailController _cocktailController;
+    private readonly DataHolder _dataHolder;
 
-    public CocktailGenerator(CocktailController cocktailController)
+    public CocktailGenerator(CocktailController cocktailController, DataHolder dataHolder)
     {
         _cocktailController = cocktailController;
+        _dataHolder = dataHolder;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -39,6 +41,7 @@ public class CocktailGenerator : BackgroundService
             {
                 Console.WriteLine("It's 4 PM, time to generate a cocktail!");
                 await _cocktailController.GetRandomCocktail();
+                _dataHolder.TodaysAchievements.ResetAchievements();
             }
         }
     }

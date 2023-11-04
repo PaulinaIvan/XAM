@@ -60,8 +60,10 @@ public class TasksController : Controller
         }
         else
         {
+            _dataHolder.TodaysAchievements.ChallengesTaken++;
             if (theExam.ChallengeHighscore < score)
             {
+                _dataHolder.TodaysAchievements.HighscoresBeaten++;
                 var result = new
                 {
                     text = $@"New {examName} highscore!

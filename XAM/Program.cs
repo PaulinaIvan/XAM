@@ -12,7 +12,7 @@ builder.Services.AddDbContext<XamDbContext>(options =>
 {
     string? connectionString = builder.Configuration.GetConnectionString("xamDatabaseConnection");
     if(connectionString == null)
-        throw new Exception("xamDatabaseConnection not configured in appsettings.json");
+        throw new Exception("xamDatabaseConnection not configured in appsettings.Development.json");
     else
         options.UseNpgsql(connectionString);
 });

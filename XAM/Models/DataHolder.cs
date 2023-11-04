@@ -6,4 +6,6 @@ public class DataHolder
 
     public int LifetimeCreatedExamsCounter { get; set; }
     public int LifetimeCreatedFlashcardsCounter { get; set; }
+
+    public string TodaysCocktail { get; set; } = "No cocktail yet";
 }

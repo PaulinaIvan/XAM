@@ -1,9 +1,11 @@
+using XAM.Controllers;
 using XAM.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DataHolder>();
+builder.Services.AddTransient<CocktailController>(); //Something is wrong here
 
 // Register CocktailGenerator as a hosted service
 builder.Services.AddHostedService<CocktailGenerator>();

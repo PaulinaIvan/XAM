@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using XAM.Controllers;
 using XAM.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
@@ -9,14 +10,11 @@ builder.Services.AddHostedService<CocktailGenerator>();
 
 builder.Services.AddDbContext<XamDbContext>(options =>
 {
-    string server = "localhost";
-    string port = "5432";
-    string database = "postgres";
-    string username = "postgres";
-    string password = "T2YAeF6gnf8P";
-
-    string connectionString = $"Server={server};Port={port};Database={database};User Id={username};Password={password}";
-    options.UseNpgsql(connectionString);
+    string? connectionString = builder.Configuration.GetConnectionString("xamDatabaseConnection");
+    if(connectionString == null)
+        throw new Exception("xamDatabaseConnection not configured in appsettings.json");
+    else
+        options.UseNpgsql(connectionString);
 });
 
 builder.Services.AddSingleton(serviceProvider =>

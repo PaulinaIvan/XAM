@@ -40,7 +40,7 @@ async function setHighscore(examName, score) {
         if (data.errorCode === "NoExamWithName")
         {
             alert(data.errorMessage);
-            return data.errorCode;
+            return data.errorMessage;
         }
         else
         {

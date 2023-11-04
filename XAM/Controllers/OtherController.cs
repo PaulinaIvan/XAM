@@ -24,8 +24,9 @@ public class OtherController : Controller
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public IActionResult Error(ErrorViewModel errorModel)
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        errorModel.RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        return View(errorModel);
     }
 }

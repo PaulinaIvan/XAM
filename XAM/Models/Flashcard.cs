@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace XAM.Models;
 
 public class Flashcard : IComparable<Flashcard>
 {
+    [Key] public int FlashcardId { get; set; }
     public string FrontText { get; set; }
     public string BackText { get; set; }
 

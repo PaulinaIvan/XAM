@@ -1,14 +1,47 @@
+using Microsoft.EntityFrameworkCore;
 using XAM.Controllers;
 using XAM.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<DataHolder>();
 builder.Services.AddTransient<CocktailController>();
-
-// Register CocktailGenerator as a hosted service
 builder.Services.AddHostedService<CocktailGenerator>();
 builder.Services.AddScoped<ErrorViewModel>();
+
+builder.Services.AddDbContext<XamDbContext>(options =>
+{
+    string? connectionString = builder.Configuration.GetConnectionString("xamDatabaseConnection");
+    if(connectionString == null)
+        throw new Exception("xamDatabaseConnection not configured in appsettings.Development.json");
+    else
+        options.UseNpgsql(connectionString);
+});
+
+builder.Services.AddSingleton(serviceProvider =>
+{
+    using var scope = serviceProvider.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<XamDbContext>();
+
+    var dataHolder = dbContext.DataHolders
+        .Include(dh => dh.Exams)
+        .ThenInclude(exam => exam.Flashcards)
+        .FirstOrDefault();
+
+    if(dataHolder == null)
+    {
+        dataHolder = new DataHolder();
+
+        dbContext.DataHolders.Add(dataHolder);
+        dbContext.SaveChanges();
+    }
+
+    Console.WriteLine("Data loaded from database:");
+    Console.WriteLine($"DataHolder Id: {dataHolder.DataHolderId}");
+    Console.WriteLine($"Exam cound: {dataHolder.Exams.Count}");
+
+    return dataHolder;
+});
 
 var app = builder.Build();
 
@@ -30,8 +63,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Other}/{action=Index}/{id?}");
-
-
 
 app.Run();
 

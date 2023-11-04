@@ -1,10 +1,20 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace XAM.Models;
 
 public class Exam : IComparable<Exam>
 {
+    [Key] public int ExamId { get; set; }
     private string NameField;
     public string Name { get { return NameField; } set { NameField = value; ValidNameCheck(value); } }
-    public DateTime Date { get; set; }
+    public DateTime Date
+    {
+        get => _date;
+        set => _date = DateTime.SpecifyKind(value, DateTimeKind.Utc);
+    }
+
+    private DateTime _date;
+
     public List<Flashcard> Flashcards { get; set; } // List of flashcards
     public int ChallengeHighscore { get; set; } = 0;
 

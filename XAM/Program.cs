@@ -1,14 +1,48 @@
+using Microsoft.EntityFrameworkCore;
 using XAM.Controllers;
 using XAM.Models;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<DataHolder>();
 builder.Services.AddTransient<CocktailController>();
-
-// Register CocktailGenerator as a hosted service
 builder.Services.AddHostedService<CocktailGenerator>();
+
+builder.Services.AddDbContext<XamDbContext>(options =>
+{
+    string server = "localhost";
+    string port = "5432";
+    string database = "postgres";
+    string username = "postgres";
+    string password = "T2YAeF6gnf8P";
+
+    string connectionString = $"Server={server};Port={port};Database={database};User Id={username};Password={password}";
+    options.UseNpgsql(connectionString);
+});
+
+builder.Services.AddSingleton(serviceProvider =>
+{
+    using var scope = serviceProvider.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<XamDbContext>();
+
+    var dataHolder = dbContext.DataHolders
+        .Include(dh => dh.Exams)
+        .ThenInclude(exam => exam.Flashcards)
+        .FirstOrDefault();
+
+    if(dataHolder == null)
+    {
+        dataHolder = new DataHolder();
+
+        dbContext.DataHolders.Add(dataHolder);
+        dbContext.SaveChanges();
+    }
+
+    Console.WriteLine("Data loaded from database:");
+    Console.WriteLine($"DataHolder Id: {dataHolder.DataHolderId}");
+    Console.WriteLine($"Exam cound: {dataHolder.Exams.Count}");
+
+    return dataHolder;
+});
 
 var app = builder.Build();
 
@@ -30,8 +64,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Other}/{action=Index}/{id?}");
-
-
 
 app.Run();
 

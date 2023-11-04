@@ -6,10 +6,12 @@ namespace XAM.Controllers;
 
 public class OtherController : Controller
 {
+    private readonly XamDbContext _context;
     private readonly DataHolder _dataHolder;
 
-    public OtherController(DataHolder dataHolder)
+    public OtherController(DataHolder dataHolder, XamDbContext context)
     {
+        _context = context;
         _dataHolder = dataHolder;
     }
 
@@ -18,8 +20,9 @@ public class OtherController : Controller
         return View();
     }
 
-    public IActionResult About()
+    public IActionResult About() // Temp saver
     {
+        _context.DeleteAndReplaceRow(_dataHolder);
         return View();
     }
 

@@ -1,9 +1,9 @@
 fetch(`/Tasks/FetchExamNames`)
 .then(response => response.json())
 .then(allExamNames => {
-    if (allExamNames && Array.isArray(allExamNames.names) && allExamNames.names.length > 0)
+    if (allExamNames && Array.isArray(allExamNames) && allExamNames.length > 0)
     {
-        allExamNames.names.forEach(examName => {
+        allExamNames.forEach(examName => {
             newOption = new Option(examName, `${examName}Exam`);
             document.getElementById("examsDropdown").add(newOption, undefined);
         });
@@ -25,7 +25,7 @@ async function getFlashcardsFromExam(examName) {
         }
         else
         {
-            return data.flashcards;
+            return data;
         }
     } catch (error) {
         console.error('Error:', error);
@@ -44,7 +44,7 @@ async function setHighscore(examName, score) {
         }
         else
         {
-            return data.text;
+            return data;
         }
     } catch (error) {
         console.error('Error:', error);

@@ -8,9 +8,33 @@ public class DataHolder
 
     public List<Exam> Exams { get; set; } = new();
 
-    public int LifetimeCreatedExamsCounter { get; set; }
-    public int LifetimeCreatedFlashcardsCounter { get; set; }
+    public StatisticsHolder Statistics { get; set; } = new();
 
-    public DailyAchievements TodaysAchievements { get; set; } = new(0, 0, 0, 0);
-    public string TodaysCocktail { get; set; } = "No cocktail yet";
+    public string? CurrentCocktail { get; set; }
+    public DateTime? TimeUntilNextCocktail
+    {
+        get
+        {
+            if (_timeUntilNextCocktail.HasValue)
+            {
+                TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
+                DateTime localTime = TimeZoneInfo.ConvertTimeFromUtc(_timeUntilNextCocktail.Value, localTimeZone);
+                return localTime;
+            }
+            else
+                return null;
+        }
+        set
+        {
+            if (value.HasValue)
+            {
+                TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
+                DateTime utcTime = TimeZoneInfo.ConvertTimeToUtc(value.Value, localTimeZone);
+                _timeUntilNextCocktail = utcTime;
+            }
+            else
+                _timeUntilNextCocktail = null;
+        }
+    }
+    private DateTime? _timeUntilNextCocktail;
 }

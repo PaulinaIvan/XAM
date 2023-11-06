@@ -58,8 +58,8 @@ public class PreparationController : Controller
         Exam newExam = new(date: parsedDate, name: name);
 
         _dataHolder.Exams.Add(newExam);
-        ++_dataHolder.LifetimeCreatedExamsCounter;
-        ++_dataHolder.TodaysAchievements.ExamsCreated;
+        ++_dataHolder.Statistics.LifetimeCreatedExamsCounter;
+        ++_dataHolder.Statistics.TodayCreatedExamsCounter;
 
         var result = new
         {
@@ -93,11 +93,11 @@ public class PreparationController : Controller
                 return BadRequest("Exam not found.");
             }
 
-            Flashcard flashcard = new Flashcard(frontText, backText);
+            Flashcard flashcard = new(frontText, backText);
             exam.Flashcards.Add(flashcard);
 
-            ++_dataHolder.LifetimeCreatedFlashcardsCounter;
-            ++_dataHolder.TodaysAchievements.FlashcardsCreated;
+            ++_dataHolder.Statistics.LifetimeCreatedFlashcardsCounter;
+            ++_dataHolder.Statistics.TodayCreatedFlashcardsCounter;
 
             int index = exam.Flashcards.IndexOf(flashcard);
 
@@ -162,33 +162,29 @@ public class PreparationController : Controller
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
                     var fileContent = reader.ReadToEnd();
-                    DataHolder? newDataHolder = JsonSerializer.Deserialize<DataHolder>(fileContent,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true,
-                        });
+                    DataHolder? newDataHolder = JsonSerializer.Deserialize<DataHolder>(fileContent);
 
                     if (newDataHolder != null)
                     {
                         List<Exam> examsNotOnFrontend = newDataHolder.Exams.Where(examA => !_dataHolder.Exams.Any(examB => examA.Name == examB.Name)).ToList();
                         _dataHolder.Exams.AddRange(examsNotOnFrontend);
-                        _dataHolder.LifetimeCreatedExamsCounter = newDataHolder.LifetimeCreatedExamsCounter;
-                        _dataHolder.LifetimeCreatedFlashcardsCounter = newDataHolder.LifetimeCreatedFlashcardsCounter;
+                        _dataHolder.Statistics.LifetimeCreatedExamsCounter = newDataHolder.Statistics.LifetimeCreatedExamsCounter;
+                        _dataHolder.Statistics.LifetimeCreatedFlashcardsCounter = newDataHolder.Statistics.LifetimeCreatedFlashcardsCounter;
 
-                        return Json(new { message = "File uploaded and parsed successfully.", list = examsNotOnFrontend });
+                        return Json(examsNotOnFrontend);
                     }
                 }
 
-                return StatusCode(500, new { message = "An error occurred while processing the file." });
+                return StatusCode(500, "An error occurred while processing the file.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing the file.", error = ex.Message });
+                return StatusCode(501, $"An error occurred while processing the file: {ex.Message}");
             }
         }
         else
         {
-            return BadRequest(new { message = "No file was selected for upload." });
+            return BadRequest("No file was selected for upload.");
         }
     }
 }

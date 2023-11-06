@@ -5,7 +5,10 @@ fetch(`/Statistics/FetchStatistics`)
     {
         document.getElementById("lifetimeExams").innerText += ` ${data.lifetimeExams}`;
         document.getElementById("lifetimeFlashcards").innerText += ` ${data.lifetimeFlashcards}`;
-        console.log(data.challengeHighscoresList);
+        document.getElementById("todayExams").innerText += ` ${data.todayExams}`;
+        document.getElementById("todayFlashcards").innerText += ` ${data.todayFlashcards}`;
+        document.getElementById("todayChallengeHighscores").innerText += ` ${data.todayChallengeHighscores}`;
+        document.getElementById("todayChallengeAttempts").innerText += ` ${data.todayChallengeAttempts}`;
         if(data.challengeHighscoresList && Array.isArray(data.challengeHighscoresList) && data.challengeHighscoresList.length > 0)
         {
             data.challengeHighscoresList.forEach(examNameScore => {

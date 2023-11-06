@@ -4,12 +4,12 @@ using XAM.Models;
 
 namespace XAM.Controllers;
 
-public class OtherController : Controller
+public class HomeController : Controller
 {
     private readonly XamDbContext _context;
     private readonly DataHolder _dataHolder;
 
-    public OtherController(DataHolder dataHolder, XamDbContext context)
+    public HomeController(DataHolder dataHolder, XamDbContext context)
     {
         _context = context;
         _dataHolder = dataHolder;
@@ -20,10 +20,17 @@ public class OtherController : Controller
         return View();
     }
 
-    public IActionResult About() // Temp saver
+    public IActionResult About()
     {
-        _context.DeleteAndReplaceRow(_dataHolder);
         return View();
+    }
+
+    public IActionResult SaveToDatabase()
+    {
+        if(_context.DeleteAndReplaceRow(_dataHolder))
+            return Json(true);
+        else
+            return BadRequest(false);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

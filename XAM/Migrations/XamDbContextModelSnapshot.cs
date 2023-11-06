@@ -30,19 +30,15 @@ namespace XAM.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DataHolderId"));
 
-                    b.Property<int>("LifetimeCreatedExamsCounter")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("LifetimeCreatedFlashcardsCounter")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TodaysCocktail")
-                        .IsRequired()
+                    b.Property<string>("CurrentCocktail")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("TimeUntilNextCocktail")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("DataHolderId");
 
-                    b.ToTable("DataHolders");
+                    b.ToTable("DataHoldersTable");
                 });
 
             modelBuilder.Entity("XAM.Models.Exam", b =>
@@ -70,7 +66,7 @@ namespace XAM.Migrations
 
                     b.HasIndex("DataHolderId");
 
-                    b.ToTable("Exams");
+                    b.ToTable("ExamsTable");
                 });
 
             modelBuilder.Entity("XAM.Models.Flashcard", b =>
@@ -96,7 +92,35 @@ namespace XAM.Migrations
 
                     b.HasIndex("ExamId");
 
-                    b.ToTable("Flashcards");
+                    b.ToTable("FlashcardsTable");
+                });
+
+            modelBuilder.Entity("XAM.Models.StatisticsHolder", b =>
+                {
+                    b.Property<int>("StatisticsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LifetimeCreatedExamsCounter")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LifetimeCreatedFlashcardsCounter")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TodayChallengesTakenCounter")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TodayCreatedExamsCounter")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TodayCreatedFlashcardsCounter")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TodayHighscoresBeatenCounter")
+                        .HasColumnType("integer");
+
+                    b.HasKey("StatisticsId");
+
+                    b.ToTable("StatisticsTable");
                 });
 
             modelBuilder.Entity("XAM.Models.Exam", b =>
@@ -115,9 +139,21 @@ namespace XAM.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("XAM.Models.StatisticsHolder", b =>
+                {
+                    b.HasOne("XAM.Models.DataHolder", null)
+                        .WithOne("Statistics")
+                        .HasForeignKey("XAM.Models.StatisticsHolder", "StatisticsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("XAM.Models.DataHolder", b =>
                 {
                     b.Navigation("Exams");
+
+                    b.Navigation("Statistics")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("XAM.Models.Exam", b =>

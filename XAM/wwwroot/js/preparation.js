@@ -286,6 +286,23 @@ function clamp(value, min, max)
     return Math.min(Math.max(value, min), max);
 }
 
+// Save to database
+document.getElementById('saveToDatabaseButton').addEventListener('click', function () {
+    fetch('/Home/SaveToDatabase')
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to save to database.');
+            }
+        })
+        .then(data => {
+            console.log(`Database save successful!: ${data}`);
+            alert(`Database save successful!`);
+        })
+        .catch(error => console.error('Error:', error));
+});
+
 // Download
 document.getElementById('downloadButton').addEventListener('click', function () {
     fetch('/Preparation/DownloadAllData')
@@ -323,9 +340,10 @@ if (file) {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.list && Array.isArray(data.list)) {
+            console.log(data);
+            if (data && Array.isArray(data)) {
 
-                data.list.forEach(exam => {
+                data.forEach(exam => {
                     addExam(exam.name, exam.date.substring(0, 10));
                     exam.flashcards.forEach(flashcard => {
                         addFlashcard(flashcard.frontText, flashcard.backText, exam.name);

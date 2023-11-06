@@ -21,8 +21,12 @@ public class StatisticsController : Controller
     {
         var result = new
         {
-            lifetimeExams = _dataHolder.LifetimeCreatedExamsCounter,
-            lifetimeFlashcards = _dataHolder.LifetimeCreatedFlashcardsCounter,
+            lifetimeExams = _dataHolder.Statistics.LifetimeCreatedExamsCounter,
+            lifetimeFlashcards = _dataHolder.Statistics.LifetimeCreatedFlashcardsCounter,
+            todayExams = _dataHolder.Statistics.TodayCreatedExamsCounter,
+            todayFlashcards = _dataHolder.Statistics.TodayCreatedFlashcardsCounter,
+            todayChallengeHighscores = _dataHolder.Statistics.TodayHighscoresBeatenCounter,
+            todayChallengeAttempts = _dataHolder.Statistics.TodayChallengesTakenCounter,
             challengeHighscoresList = _dataHolder.Exams
                 .Where(exam => exam.ChallengeHighscore > 0)
                 .Select(exam => new { name = exam.Name, challengeHighscore = exam.ChallengeHighscore })

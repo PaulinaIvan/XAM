@@ -7,18 +7,13 @@
     <link rel="stylesheet" type="text/css" href="~/css/preparation.css">
 </head>
 
-<div style="display: grid; grid-template-columns: 9fr 7fr;">
-    <div>
-    <input type="text" id="examName" placeholder="Exam name">
-    <input type="date" id="examDate">
-    <button onclick="createExam()">Add exam</button>
-    <button id="downloadButton">Download data</button>
-    </div>
-    <div style="text-align: right;">
-    <label for="fileInput" id="browseButton" class="button-style">Browse</label>
-    <input type="file" id="fileInput" style="display: none;">
-    </div>
-</div>
+<input type="text" id="examName" placeholder="Exam name">
+<input type="date" id="examDate">
+<button onclick="createExam()">Add exam</button>
+<button id="downloadButton">Download data</button>
+<label for="fileInput" id="browseButton" class="button-style">Browse</label>
+<input type="file" id="fileInput" style="display: none;">
+<button id="saveToDatabaseButton">Save to database</button>
 <div id="exam-grid"></div>
 
 <script src="~/js/preparation.js"></script>

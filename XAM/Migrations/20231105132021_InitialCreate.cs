@@ -13,22 +13,21 @@ namespace XAM.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "DataHolders",
+                name: "DataHoldersTable",
                 columns: table => new
                 {
                     DataHolderId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    LifetimeCreatedExamsCounter = table.Column<int>(type: "integer", nullable: false),
-                    LifetimeCreatedFlashcardsCounter = table.Column<int>(type: "integer", nullable: false),
-                    TodaysCocktail = table.Column<string>(type: "text", nullable: false)
+                    TimeUntilNextCocktail = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CurrentCocktail = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataHolders", x => x.DataHolderId);
+                    table.PrimaryKey("PK_DataHoldersTable", x => x.DataHolderId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Exams",
+                name: "ExamsTable",
                 columns: table => new
                 {
                     ExamId = table.Column<int>(type: "integer", nullable: false)
@@ -40,17 +39,40 @@ namespace XAM.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Exams", x => x.ExamId);
+                    table.PrimaryKey("PK_ExamsTable", x => x.ExamId);
                     table.ForeignKey(
-                        name: "FK_Exams_DataHolders_DataHolderId",
+                        name: "FK_ExamsTable_DataHoldersTable_DataHolderId",
                         column: x => x.DataHolderId,
-                        principalTable: "DataHolders",
+                        principalTable: "DataHoldersTable",
                         principalColumn: "DataHolderId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Flashcards",
+                name: "StatisticsTable",
+                columns: table => new
+                {
+                    StatisticsId = table.Column<int>(type: "integer", nullable: false),
+                    LifetimeCreatedExamsCounter = table.Column<int>(type: "integer", nullable: false),
+                    LifetimeCreatedFlashcardsCounter = table.Column<int>(type: "integer", nullable: false),
+                    TodayCreatedExamsCounter = table.Column<int>(type: "integer", nullable: false),
+                    TodayCreatedFlashcardsCounter = table.Column<int>(type: "integer", nullable: false),
+                    TodayHighscoresBeatenCounter = table.Column<int>(type: "integer", nullable: false),
+                    TodayChallengesTakenCounter = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StatisticsTable", x => x.StatisticsId);
+                    table.ForeignKey(
+                        name: "FK_StatisticsTable_DataHoldersTable_StatisticsId",
+                        column: x => x.StatisticsId,
+                        principalTable: "DataHoldersTable",
+                        principalColumn: "DataHolderId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FlashcardsTable",
                 columns: table => new
                 {
                     FlashcardId = table.Column<int>(type: "integer", nullable: false)
@@ -61,23 +83,23 @@ namespace XAM.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Flashcards", x => x.FlashcardId);
+                    table.PrimaryKey("PK_FlashcardsTable", x => x.FlashcardId);
                     table.ForeignKey(
-                        name: "FK_Flashcards_Exams_ExamId",
+                        name: "FK_FlashcardsTable_ExamsTable_ExamId",
                         column: x => x.ExamId,
-                        principalTable: "Exams",
+                        principalTable: "ExamsTable",
                         principalColumn: "ExamId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Exams_DataHolderId",
-                table: "Exams",
+                name: "IX_ExamsTable_DataHolderId",
+                table: "ExamsTable",
                 column: "DataHolderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Flashcards_ExamId",
-                table: "Flashcards",
+                name: "IX_FlashcardsTable_ExamId",
+                table: "FlashcardsTable",
                 column: "ExamId");
         }
 
@@ -85,13 +107,16 @@ namespace XAM.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Flashcards");
+                name: "FlashcardsTable");
 
             migrationBuilder.DropTable(
-                name: "Exams");
+                name: "StatisticsTable");
 
             migrationBuilder.DropTable(
-                name: "DataHolders");
+                name: "ExamsTable");
+
+            migrationBuilder.DropTable(
+                name: "DataHoldersTable");
         }
     }
 }

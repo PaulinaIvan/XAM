@@ -6,9 +6,10 @@ public class XamDbContext : DbContext
 {
     public XamDbContext(DbContextOptions<XamDbContext> options) : base(options) { }
 
-    public DbSet<DataHolder> DataHolders { get; set; }
-    public DbSet<Exam> Exams { get; set; }
-    public DbSet<Flashcard> Flashcards { get; set; }
+    public DbSet<DataHolder> DataHoldersTable { get; set; }
+    public DbSet<Exam> ExamsTable { get; set; }
+    public DbSet<Flashcard> FlashcardsTable { get; set; }
+    public DbSet<StatisticsHolder> StatisticsTable { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,18 +22,24 @@ public class XamDbContext : DbContext
             .HasMany(exam => exam.Flashcards)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<DataHolder>()
+            .HasOne(dataHolder => dataHolder.Statistics)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasForeignKey<StatisticsHolder>(statisticsHolder => statisticsHolder.StatisticsId);
     }
 
-    public void DeleteAndReplaceRow(DataHolder newData)
+    public bool DeleteAndReplaceRow(DataHolder newData) // True if successful
     {
-        var existingData = DataHolders.FirstOrDefault();
+        var existingData = DataHoldersTable.FirstOrDefault();
         if (existingData != null)
         {
-            DataHolders.Remove(existingData);
+            DataHoldersTable.Remove(existingData);
             SaveChanges();
         }
 
-        DataHolders.Add(newData);
-        SaveChanges();
+        DataHoldersTable.Add(newData);
+        return SaveChanges() > 0;
     }
 }

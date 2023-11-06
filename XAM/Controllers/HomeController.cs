@@ -25,12 +25,12 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult SaveToDatabase()
+    public IActionResult SaveToDatabaseAction()
     {
-        if(_context.DeleteAndReplaceRow(_dataHolder))
-            return Json(true);
+        if(_context.SaveToDatabase(_dataHolder))
+            return Json("Database save successful!");
         else
-            return BadRequest(false);
+            return StatusCode(500);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -30,7 +30,7 @@ public class XamDbContext : DbContext
             .HasForeignKey<StatisticsHolder>(statisticsHolder => statisticsHolder.StatisticsId);
     }
 
-    public bool DeleteAndReplaceRow(DataHolder newData) // True if successful
+    public void DeleteAndReplaceRow(DataHolder newData)
     {
         var existingData = DataHoldersTable.FirstOrDefault();
         if (existingData != null)
@@ -40,6 +40,6 @@ public class XamDbContext : DbContext
         }
 
         DataHoldersTable.Add(newData);
-        return SaveChanges() > 0;
+        SaveChanges();
     }
 }

@@ -297,8 +297,8 @@ document.getElementById('saveToDatabaseButton').addEventListener('click', functi
             }
         })
         .then(data => {
-            console.log(`Database save successful!: ${data}`);
-            alert(`Database save successful!`);
+            console.log(data);
+            alert(data);
         })
         .catch(error => console.error('Error:', error));
 });

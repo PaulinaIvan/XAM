@@ -27,10 +27,17 @@ public class HomeController : Controller
 
     public IActionResult SaveToDatabase()
     {
-        if(_context.DeleteAndReplaceRow(_dataHolder))
-            return Json(true);
-        else
-            return BadRequest(false);
+        try
+        {
+            _context.DeleteAndReplaceRow(_dataHolder);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occured when saving to the database: {ex.Message}");
+            return StatusCode(500);
+        }
+
+        return Json("Database save successful!");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

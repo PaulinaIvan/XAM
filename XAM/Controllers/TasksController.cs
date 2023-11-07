@@ -22,11 +22,7 @@ public class TasksController : Controller
     {
         List<string> examNames = _dataHolder.Exams.Select(exam => exam.Name).ToList();
 
-        var result = new
-        {
-            names = examNames
-        };
-        return Json(result);
+        return Json(examNames);
     }
 
     public IActionResult FetchFlashcardsOfExam(string examName)
@@ -41,11 +37,7 @@ public class TasksController : Controller
         else
         {
             Shuffle(flashcards);
-            var result = new
-            {
-                flashcards
-            };
-            return Json(result);
+            return Json(flashcards);
         }
     }
 
@@ -64,24 +56,18 @@ public class TasksController : Controller
             if (theExam.ChallengeHighscore < score)
             {
                 _dataHolder.Statistics.TodayHighscoresBeatenCounter++;
-                var result = new
-                {
-                    text = $@"New {examName} highscore!
-                    Old highscore: {theExam.ChallengeHighscore}
-                    New highscore: {score}"
-                };
+                int oldHighscore = theExam.ChallengeHighscore;
                 theExam.ChallengeHighscore = score;
+                var result = $@"New {examName} highscore!
+                                Old highscore: {oldHighscore}
+                                New highscore: {score}";
                 return Json(result);
             }
             else
             {
-                var result = new
-                {
-                    text =
-                    $@"No new highscore for {examName}...
-                    Score: {score}
-                    Highscore: {theExam.ChallengeHighscore}"
-                };
+                var result = $@"No new highscore for {examName}...
+                                Score: {score}
+                                Highscore: {theExam.ChallengeHighscore}";
                 return Json(result);
             }
         }

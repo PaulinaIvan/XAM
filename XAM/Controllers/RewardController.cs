@@ -7,12 +7,14 @@ namespace XAM.Controllers;
 public class RewardController : Controller
 {
     private readonly DataHolder _dataHolder;
+    private readonly HttpClient _client;
 
-    public RewardController(DataHolder dataHolder)
+    public RewardController(DataHolder dataHolder, HttpClient client)
     {
         _dataHolder = dataHolder;
+        _client = client;
 
-        Task CocktailProducerTask = Task.Run(() => CocktailWaiter(CancellationToken.None));
+        Task CocktailProducerTask = Task.Run(() => CocktailWaiter(_client));
     }
 
     public IActionResult Reward()
@@ -27,68 +29,57 @@ public class RewardController : Controller
             ErrorRecord errorResponse = CreateErrorResponse("NotEligible", "You're not productive enough for the cocktail...");
             return Json(errorResponse);
         }
-    
-        string? todaysCocktail = _dataHolder.CurrentCocktail;
-        if (string.IsNullOrEmpty(todaysCocktail))
+
+        if (string.IsNullOrEmpty(_dataHolder.CurrentCocktail))
         {
-            ErrorRecord errorResponse = CreateErrorResponse("NoCocktailAvailable", $"Please wait for the next cocktail in {_dataHolder.TimeUntilNextCocktail}.");
+            ErrorRecord errorResponse = CreateErrorResponse("NoCocktailAvailable", $"Cocktail API is having issues, please try again at {_dataHolder.TimeUntilNextCocktail}.");
             return Json(errorResponse);
         }
 
-        return Content(todaysCocktail, "application/json");
+        return Content(_dataHolder.CurrentCocktail, "application/json");
     }
 
-    private async Task CocktailWaiter(CancellationToken stoppingToken)
+    private async Task CocktailWaiter(HttpClient client)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        if (_dataHolder.TimeUntilNextCocktail == null || _dataHolder.TimeUntilNextCocktail < DateTime.Now)
         {
-            if (_dataHolder.TimeUntilNextCocktail == null || _dataHolder.TimeUntilNextCocktail < DateTime.Now)
-            {
-                _dataHolder.TimeUntilNextCocktail = DateTime.Now.Date.AddDays(1);
-
-                string? newCocktail = null;
-                try
-                {
-                    newCocktail = await GetRandomCocktail();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                _dataHolder.CurrentCocktail = newCocktail;
+            if(_dataHolder.CurrentCocktail != null)
                 _dataHolder.Statistics.ResetTodaysStatistics(); // This should be in its own time tracing async method
-            }
-            else
+
+            _dataHolder.TimeUntilNextCocktail = DateTime.Now.Date.AddDays(1);
+            
+            try
             {
-                await Task.Delay(_dataHolder.TimeUntilNextCocktail.Value.Subtract(DateTime.Now), stoppingToken);
+                _dataHolder.CurrentCocktail = await GetRandomCocktail(client);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                _dataHolder.CurrentCocktail = null;
+            }
+            
+        }
+        else
+        {
+            await Task.Delay(_dataHolder.TimeUntilNextCocktail.Value.Subtract(DateTime.Now));
         }
     }
 
-    private static async Task<string> GetRandomCocktail()
+    private static async Task<string> GetRandomCocktail(HttpClient client)
     {
         try
         {
-            using (HttpClient client = new())
-            {
-                string apiUrl = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
-                HttpResponseMessage response = await client.GetAsync(apiUrl);
+            string apiUrl = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
+            HttpResponseMessage response = await client.GetAsync(apiUrl);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    _ = new Exception($"API request failed: {response.ReasonPhrase}");
-                }
-            }
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsStringAsync();
+            else
+                throw new Exception($"Request failed: {response.ReasonPhrase}");
         }
         catch (Exception ex)
         {
-            _ = new Exception($"An error occurred while fetching data from the API: {ex.Message}");
+            throw new Exception($"An error occurred while fetching data from the Cocktail API: {ex.StackTrace}");
         }
-
-        return "";
     }
 }

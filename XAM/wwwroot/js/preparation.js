@@ -298,6 +298,7 @@ document.getElementById('saveToDatabaseButton').addEventListener('click', functi
         })
         .then(data => {
             console.log(`Database save successful!: ${data}`);
+            alert(`Database save successful!`);
         })
         .catch(error => console.error('Error:', error));
 });
@@ -339,9 +340,10 @@ if (file) {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.list && Array.isArray(data.list)) {
+            console.log(data);
+            if (data && Array.isArray(data)) {
 
-                data.list.forEach(exam => {
+                data.forEach(exam => {
                     addExam(exam.name, exam.date.substring(0, 10));
                     exam.flashcards.forEach(flashcard => {
                         addFlashcard(flashcard.frontText, flashcard.backText, exam.name);

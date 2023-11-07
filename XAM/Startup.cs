@@ -16,6 +16,7 @@ public class Startup
     {
         services.AddControllersWithViews();
         services.AddScoped<ErrorViewModel>();
+        services.AddSingleton<HttpClient>();
         services.AddDbContext<XamDbContext>(options =>
         {
             string? connectionString = Configuration.GetConnectionString("xamDatabaseConnection");

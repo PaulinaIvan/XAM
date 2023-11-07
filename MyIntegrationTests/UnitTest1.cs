@@ -197,6 +197,13 @@ namespace MyIntegrationTests
         {
             // Arrange
             InvalidExamNameException invalidExamNameException = new InvalidExamNameException();
+    public class APIRequestExeptionIntegrationTests
+    {
+        [Fact]
+        public void APIRequestExeption_ThrowsCorrectly()
+        {
+            // Arrange
+            APIRequestExeption apiRequestExeption = new APIRequestExeption();
 
             bool catchChecker = false;
             try
@@ -205,6 +212,9 @@ namespace MyIntegrationTests
                 throw invalidExamNameException;
             }
             catch (InvalidExamNameException ex)
+                throw apiRequestExeption;
+            }
+            catch (APIRequestExeption ex)
             {
                 catchChecker = true;
             }
@@ -220,6 +230,10 @@ namespace MyIntegrationTests
         {
             // Arrange
             InvalidExamNameException invalidExamNameException = new InvalidExamNameException("Some message.");
+        public void APIRequestExeption_ThrowsWithMessageCorrectly()
+        {
+            // Arrange
+            APIRequestExeption apiRequestExeption = new APIRequestExeption("Some message.");
 
             try
             {
@@ -227,6 +241,9 @@ namespace MyIntegrationTests
                 throw invalidExamNameException;
             }
             catch (InvalidExamNameException ex)
+                throw apiRequestExeption;
+            }
+            catch (APIRequestExeption ex)
             {
                 // Assert
                 Assert.Equal(ex.Message, "Some message.");

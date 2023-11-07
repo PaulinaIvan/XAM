@@ -44,7 +44,7 @@ public class RewardController : Controller
         if (_dataHolder.TimeUntilNextCocktail == null || _dataHolder.TimeUntilNextCocktail < DateTime.Now)
         {
             if(_dataHolder.CurrentCocktail != null)
-                _dataHolder.Statistics.ResetTodaysStatistics(); // This should be in its own time tracing async method
+                _dataHolder.Statistics.ResetTodaysStatistics();
 
             _dataHolder.TimeUntilNextCocktail = DateTime.Now.Date.AddDays(1);
             
@@ -52,12 +52,16 @@ public class RewardController : Controller
             {
                 _dataHolder.CurrentCocktail = await GetRandomCocktail(client);
             }
+            catch (APIRequestExeption ex)
+            {
+                Console.WriteLine($"APIRequestExeption: {ex.Message}");
+                _dataHolder.CurrentCocktail = null;
+            }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 _dataHolder.CurrentCocktail = null;
             }
-            
         }
         else
         {
@@ -75,11 +79,11 @@ public class RewardController : Controller
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStringAsync();
             else
-                throw new Exception($"Request failed: {response.ReasonPhrase}");
+                throw new APIRequestExeption($"Request failed: {response.ReasonPhrase}");
         }
-        catch (Exception ex)
+        catch (APIRequestExeption ex)
         {
-            throw new Exception($"An error occurred while fetching data from the Cocktail API: {ex.StackTrace}");
+            throw new APIRequestExeption($"An error occurred while fetching data from the Cocktail API: {ex.StackTrace}");
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using static XAM.Models.HelperClass;
+using static XAM.Controllers.PreparationController;
 
 namespace MyIntegrationTests
 {
@@ -271,6 +272,34 @@ namespace MyIntegrationTests
 
             // Assert
             Assert.Equal(dataHolder.TimeUntilNextCocktail, dateTime);
+        }
+    }
+
+    public class GetExamsNotOldDataHolderUnitTests
+    {
+        [Fact]
+        public void GetExamsNotOldDataHolder_ReturnsCorrectly()
+        {
+            // Arrange
+            DataHolder dataHolder1 = new DataHolder();
+            DataHolder dataHolder2 = new DataHolder();
+            List<Exam> exams = new List<Exam>
+            {
+                new Exam("Math", new DateTime(2023,12,01, 00,00,00)),
+                new Exam("Science", new DateTime(2023,12,05, 00,00,00)),
+                new Exam("History", new DateTime(2023,12,07, 00,00,00))
+            };
+            List<Exam> examsNotOnOld = new();
+
+            // Act
+            dataHolder1.Exams.Add(exams[0]);
+            dataHolder1.Exams.Add(exams[1]);
+            dataHolder2.Exams = exams;
+
+            examsNotOnOld = GetExamsNotOldDataHolder(dataHolder1, dataHolder2);
+
+            // Assert
+            Assert.Equal(examsNotOnOld[0], exams[2]);
         }
     }
 }

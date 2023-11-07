@@ -28,6 +28,10 @@ button {
   background-color: #FCA311;
   border: 2px solid #ca820e;
   border-radius: 10px;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #E0863D;
 }
 
 input {
@@ -41,4 +45,11 @@ input {
 .nav-link.text-dark {
   font-weight: 500;
   font-size: 20px;
+}
+
+#loginScreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; 
 }

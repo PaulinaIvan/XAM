@@ -12,7 +12,7 @@ using XAM.Models;
 namespace XAM.Migrations
 {
     [DbContext(typeof(XamDbContext))]
-    [Migration("20231105132021_InitialCreate")]
+    [Migration("20231107150115_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,6 +34,9 @@ namespace XAM.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DataHolderId"));
 
                     b.Property<string>("CurrentCocktail")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OwnerUsername")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("TimeUntilNextCocktail")

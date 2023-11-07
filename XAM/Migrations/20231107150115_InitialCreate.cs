@@ -18,8 +18,9 @@ namespace XAM.Migrations
                 {
                     DataHolderId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TimeUntilNextCocktail = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CurrentCocktail = table.Column<string>(type: "text", nullable: true)
+                    OwnerUsername = table.Column<string>(type: "text", nullable: true),
+                    CurrentCocktail = table.Column<string>(type: "text", nullable: true),
+                    TimeUntilNextCocktail = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {

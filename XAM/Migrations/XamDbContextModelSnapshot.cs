@@ -33,6 +33,9 @@ namespace XAM.Migrations
                     b.Property<string>("CurrentCocktail")
                         .HasColumnType("text");
 
+                    b.Property<string>("OwnerUsername")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("TimeUntilNextCocktail")
                         .HasColumnType("timestamp with time zone");
 

@@ -22,7 +22,7 @@ function createExam()
 
     if(examNameValue === '' || examDateValue === '')
     {
-        alert("Please enter details!");
+        alert("Please enter exam details!");
         return;
     }
 
@@ -111,6 +111,12 @@ function addExam(examNameValue, dateStringValue)
 
 function createFlashcard(frontTextInput, backTextInput, examNameValue)
 {
+    if(frontTextInput.value == '' || frontTextInput.value == '')
+    {
+        alert("Please enter flashcard details!");
+        return;
+    }
+
     fetch(`/Preparation/CreateFlashcard?frontText=${frontTextInput.value}&backText=${backTextInput.value}&examName=${examNameValue}`)
         .then(response => response.json())
         .then(data => {
@@ -285,23 +291,6 @@ function clamp(value, min, max)
 {
     return Math.min(Math.max(value, min), max);
 }
-
-// Save to database
-document.getElementById('saveToDatabaseButton').addEventListener('click', function () {
-    fetch('/Home/SaveToDatabaseAction')
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Failed to save to database.');
-            }
-        })
-        .then(data => {
-            console.log(data);
-            alert(data);
-        })
-        .catch(error => console.error('Error:', error));
-});
 
 // Download
 document.getElementById('downloadButton').addEventListener('click', function () {

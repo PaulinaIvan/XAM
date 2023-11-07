@@ -288,7 +288,7 @@ function clamp(value, min, max)
 
 // Save to database
 document.getElementById('saveToDatabaseButton').addEventListener('click', function () {
-    fetch('/Other/SaveToDatabase')
+    fetch('/Home/SaveToDatabase')
         .then(response => {
             if (response.ok) {
                 return response.json();

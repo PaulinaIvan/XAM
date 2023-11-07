@@ -8,19 +8,11 @@ public class HomeController : Controller
 {
     private readonly XamDbContext _context;
     private readonly DataHolder _dataHolder;
-    private readonly IHostApplicationLifetime _applicationLifetime;
 
-    public HomeController(DataHolder dataHolder, XamDbContext context, IHostApplicationLifetime applicationLifetime)
+    public HomeController(DataHolder dataHolder, XamDbContext context)
     {
         _context = context;
         _dataHolder = dataHolder;
-        _applicationLifetime = applicationLifetime;
-
-        _applicationLifetime.ApplicationStopping.Register(() =>
-        {
-            DateTime lastShutdownDate = DateTime.Now.ToUniversalTime();
-            Console.WriteLine(lastShutdownDate);
-        });
     }
 
     public IActionResult Index()

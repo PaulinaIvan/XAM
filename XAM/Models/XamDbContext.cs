@@ -30,7 +30,22 @@ public class XamDbContext : DbContext
             .HasForeignKey<StatisticsHolder>(statisticsHolder => statisticsHolder.StatisticsId);
     }
 
-    public void DeleteAndReplaceRow(DataHolder newData)
+    public bool SaveToDatabase(DataHolder newData)
+    {
+        try
+        {
+            DeleteAndReplaceRow(newData);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occured when saving to the database: {ex.Message}");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void DeleteAndReplaceRow(DataHolder newData)
     {
         var existingData = DataHoldersTable.FirstOrDefault();
         if (existingData != null)

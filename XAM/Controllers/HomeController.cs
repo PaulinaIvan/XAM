@@ -25,19 +25,12 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult SaveToDatabase()
+    public IActionResult SaveToDatabaseAction()
     {
-        try
-        {
-            _context.DeleteAndReplaceRow(_dataHolder);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"An error occured when saving to the database: {ex.Message}");
+        if(_context.SaveToDatabase(_dataHolder))
+            return Json("Database save successful!");
+        else
             return StatusCode(500);
-        }
-
-        return Json("Database save successful!");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

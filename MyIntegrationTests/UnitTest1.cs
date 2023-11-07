@@ -86,4 +86,74 @@ namespace MyIntegrationTests
             Assert.Contains(flashcard, exam.Flashcards);
         }
     }
+
+    public class StatisticsIntegrationTests
+    {
+        [Fact]
+        public void StatisticsHolder_AddsStatisticsCorrectly()
+        {
+            // Arrange
+            StatisticsHolder statisticsHolder = new();
+
+            // Act
+            statisticsHolder.LifetimeCreatedExamsCounter++;
+            statisticsHolder.LifetimeCreatedFlashcardsCounter++;
+            statisticsHolder.TodayCreatedExamsCounter++;
+            statisticsHolder.TodayCreatedFlashcardsCounter++;
+            statisticsHolder.TodayHighscoresBeatenCounter++;
+            statisticsHolder.TodayChallengesTakenCounter++;
+
+            // Assert
+            Assert.Equal(statisticsHolder.LifetimeCreatedExamsCounter, 1);
+            Assert.Equal(statisticsHolder.LifetimeCreatedFlashcardsCounter, 1);
+            Assert.Equal(statisticsHolder.TodayCreatedExamsCounter, 1);
+            Assert.Equal(statisticsHolder.TodayCreatedFlashcardsCounter, 1);
+            Assert.Equal(statisticsHolder.TodayHighscoresBeatenCounter, 1);
+            Assert.Equal(statisticsHolder.TodayChallengesTakenCounter, 1);
+        }
+
+        [Fact]
+        public void StatisticsHolder_IsEligibleForCocktail()
+        {
+            // Arrange
+            StatisticsHolder statisticsHolder1 = new();
+            StatisticsHolder statisticsHolder2 = new();
+
+            // Act
+            statisticsHolder1.TodayHighscoresBeatenCounter = 1;
+            statisticsHolder1.TodayChallengesTakenCounter = 1;
+
+            statisticsHolder2.TodayHighscoresBeatenCounter = 2;
+            statisticsHolder2.TodayChallengesTakenCounter = 2;
+
+            // Assert
+            Assert.False(statisticsHolder1.IsEligibleForCocktail());
+            Assert.True(statisticsHolder2.IsEligibleForCocktail());
+        }
+
+        [Fact]
+        public void StatisticsHolder_ResetTodaysStatistics()
+        {
+            // Arrange
+            StatisticsHolder statisticsHolder = new();
+
+            // Act
+            statisticsHolder.LifetimeCreatedExamsCounter = 1;
+            statisticsHolder.LifetimeCreatedFlashcardsCounter = 1;
+            statisticsHolder.TodayCreatedExamsCounter = 1;
+            statisticsHolder.TodayCreatedFlashcardsCounter = 1;
+            statisticsHolder.TodayHighscoresBeatenCounter = 1;
+            statisticsHolder.TodayChallengesTakenCounter = 1;
+
+            statisticsHolder.ResetTodaysStatistics();
+
+            // Assert
+            Assert.Equal(statisticsHolder.LifetimeCreatedExamsCounter, 1);
+            Assert.Equal(statisticsHolder.LifetimeCreatedFlashcardsCounter, 1);
+            Assert.Equal(statisticsHolder.TodayCreatedExamsCounter, 0);
+            Assert.Equal(statisticsHolder.TodayCreatedFlashcardsCounter, 0);
+            Assert.Equal(statisticsHolder.TodayHighscoresBeatenCounter, 0);
+            Assert.Equal(statisticsHolder.TodayChallengesTakenCounter, 0);
+        }
+    }
 }

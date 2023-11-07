@@ -86,4 +86,48 @@ namespace MyIntegrationTests
             Assert.Contains(flashcard, exam.Flashcards);
         }
     }
+
+    public class APIRequestExeptionIntegrationTests
+    {
+        [Fact]
+        public void APIRequestExeption_ThrowsCorrectly()
+        {
+            // Arrange
+            APIRequestExeption apiRequestExeption = new APIRequestExeption();
+
+            bool catchChecker = false;
+            try
+            {
+                // Act
+                throw apiRequestExeption;
+            }
+            catch (APIRequestExeption ex)
+            {
+                catchChecker = true;
+            }
+            finally
+            {
+                // Assert
+                Assert.True(catchChecker);
+            }
+        }
+
+        [Fact]
+        public void APIRequestExeption_ThrowsWithMessageCorrectly()
+        {
+            // Arrange
+            APIRequestExeption apiRequestExeption = new APIRequestExeption("Some message.");
+
+            try
+            {
+                // Act
+                throw apiRequestExeption;
+            }
+            catch (APIRequestExeption ex)
+            {
+                // Assert
+                Assert.Equal(ex.Message, "Some message.");
+            }
+        }
+    }
 }

@@ -14,7 +14,7 @@ public class RewardController : Controller
         _dataHolder = dataHolder;
         _client = client;
 
-        Task CocktailProducerTask = Task.Run(() => CocktailWaiter(_client));
+        Task CocktailProducerTask = Task.Run(() => CocktailWaiter(_client, CancellationToken.None));
     }
 
     public IActionResult Reward()
@@ -39,29 +39,32 @@ public class RewardController : Controller
         return Content(_dataHolder.CurrentCocktail, "application/json");
     }
 
-    private async Task CocktailWaiter(HttpClient client)
+    private async Task CocktailWaiter(HttpClient client, CancellationToken cancellationToken)
     {
-        if (_dataHolder.TimeUntilNextCocktail == null || _dataHolder.TimeUntilNextCocktail < DateTime.Now)
+        while(!cancellationToken.IsCancellationRequested)
         {
-            if(_dataHolder.CurrentCocktail != null)
-                _dataHolder.Statistics.ResetTodaysStatistics(); // This should be in its own time tracing async method
+            if (_dataHolder.TimeUntilNextCocktail == null || _dataHolder.TimeUntilNextCocktail < DateTime.Now)
+            {
+                if(_dataHolder.CurrentCocktail != null)
+                    _dataHolder.Statistics.ResetTodaysStatistics(); // This should be in its own time tracing async method
 
-            _dataHolder.TimeUntilNextCocktail = DateTime.Now.Date.AddDays(1);
-            
-            try
-            {
-                _dataHolder.CurrentCocktail = await GetRandomCocktail(client);
+                _dataHolder.TimeUntilNextCocktail = DateTime.Now.Date.AddDays(1);
+                
+                try
+                {
+                    _dataHolder.CurrentCocktail = await GetRandomCocktail(client);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    _dataHolder.CurrentCocktail = null;
+                }
+                
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine(ex.Message);
-                _dataHolder.CurrentCocktail = null;
+                await Task.Delay(_dataHolder.TimeUntilNextCocktail.Value.Subtract(DateTime.Now), cancellationToken);
             }
-            
-        }
-        else
-        {
-            await Task.Delay(_dataHolder.TimeUntilNextCocktail.Value.Subtract(DateTime.Now));
         }
     }
 

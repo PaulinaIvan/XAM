@@ -232,4 +232,45 @@ namespace MyIntegrationTests
             }
         }
     }
+
+    public class DataHolderIntegrationTests
+    {
+        [Fact]
+        public void DataHolder_HoldsSimplePropertiesCorrectly()
+        {
+            // Arrange
+            DataHolder dataHolder = new DataHolder();
+
+            // Act
+            dataHolder.DataHolderId = 5;
+
+            List<Exam> exams = new();
+            dataHolder.Exams = exams;
+
+            StatisticsHolder statisticsHolder = new();
+            dataHolder.Statistics = statisticsHolder;
+
+            dataHolder.CurrentCocktail = "Some cocktail.";
+
+            // Assert
+            Assert.Equal(dataHolder.DataHolderId, 5);
+            Assert.Equal(dataHolder.Exams, exams);
+            Assert.Equal(dataHolder.Statistics, statisticsHolder);
+            Assert.Equal(dataHolder.CurrentCocktail, "Some cocktail.");
+        }
+
+        [Fact]
+        public void DataHolder_HiddenUtcWorksCorrectly()
+        {
+            // Arrange
+            DataHolder dataHolder = new DataHolder();
+            DateTime dateTime = new DateTime(2023,11,01, 00,00,00);
+
+            // Act
+            dataHolder.TimeUntilNextCocktail = dateTime;
+
+            // Assert
+            Assert.Equal(dataHolder.TimeUntilNextCocktail, dateTime);
+        }
+    }
 }

@@ -12,15 +12,15 @@ namespace MyIntegrationTests
     public class ExtensionsTests
     {
         [Fact]
-        public void IsMadeOfLettersNumbersAndSpace()
+        public void IsValidExamName()
         {
             // Arrange
             var strTrue = "Test 123";
             var strFalse = "@#$%^&*(";
 
             // Act
-            var resultTrue = strTrue.IsMadeOfLettersNumbersAndSpaces();
-            var resulFalse = strFalse.IsMadeOfLettersNumbersAndSpaces();
+            var resultTrue = strTrue.IsValidExamName();
+            var resulFalse = strFalse.IsValidExamName();
 
             // Assert
             Assert.True(resultTrue);

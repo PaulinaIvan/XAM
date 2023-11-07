@@ -6,6 +6,7 @@ using Moq;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using static XAM.Models.HelperClass;
 
 namespace MyIntegrationTests
 {
@@ -154,6 +155,37 @@ namespace MyIntegrationTests
             Assert.Equal(statisticsHolder.TodayCreatedFlashcardsCounter, 0);
             Assert.Equal(statisticsHolder.TodayHighscoresBeatenCounter, 0);
             Assert.Equal(statisticsHolder.TodayChallengesTakenCounter, 0);
+        }
+    }
+
+    public class ErrorRecordIntegrationTests
+    {
+        [Fact]
+        public void ErrorRecord_CreatesErrorRecordCorrectly()
+        {
+            // Arrange
+            ErrorRecord errorRecord;
+
+            // Act
+            errorRecord = CreateErrorResponse("SomeErrorCode", "Some message.");
+
+            // Assert
+            Assert.Equal(errorRecord.ErrorCode, "SomeErrorCode");
+            Assert.Equal(errorRecord.ErrorMessage, "Some message.");
+        }
+
+        [Fact]
+        public void ErrorRecord_CreatesErrorRecordWithDefaultValue()
+        {
+            // Arrange
+            ErrorRecord errorRecord;
+
+            // Act
+            errorRecord = CreateErrorResponse("SomeErrorCode");
+
+            // Assert
+            Assert.Equal(errorRecord.ErrorCode, "SomeErrorCode");
+            Assert.Equal(errorRecord.ErrorMessage, "Unknown error.");
         }
     }
 }

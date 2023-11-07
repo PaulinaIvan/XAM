@@ -188,4 +188,48 @@ namespace MyIntegrationTests
             Assert.Equal(errorRecord.ErrorMessage, "Unknown error.");
         }
     }
+
+    public class InvalidExamNameExceptionIntegrationTests
+    {
+        [Fact]
+        public void InvalidExamNameException_ThrowsCorrectly()
+        {
+            // Arrange
+            InvalidExamNameException invalidExamNameException = new InvalidExamNameException();
+
+            bool catchChecker = false;
+            try
+            {
+                // Act
+                throw invalidExamNameException;
+            }
+            catch (InvalidExamNameException ex)
+            {
+                catchChecker = true;
+            }
+            finally
+            {
+                // Assert
+                Assert.True(catchChecker);
+            }
+        }
+
+        [Fact]
+        public void InvalidExamNameException_ThrowsWithMessageCorrectly()
+        {
+            // Arrange
+            InvalidExamNameException invalidExamNameException = new InvalidExamNameException("Some message.");
+
+            try
+            {
+                // Act
+                throw invalidExamNameException;
+            }
+            catch (InvalidExamNameException ex)
+            {
+                // Assert
+                Assert.Equal(ex.Message, "Some message.");
+            }
+        }
+    }
 }

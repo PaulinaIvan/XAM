@@ -52,7 +52,7 @@ public class Startup
     {
         if (!env.IsDevelopment())
         {
-            app.UseExceptionHandler("/Other/Error");
+            app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
 

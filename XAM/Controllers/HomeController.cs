@@ -4,13 +4,13 @@ using XAM.Models;
 
 namespace XAM.Controllers;
 
-public class OtherController : Controller
+public class HomeController : Controller
 {
     private readonly XamDbContext _context;
     private readonly DataHolder _dataHolder;
     private readonly IHostApplicationLifetime _applicationLifetime;
 
-    public OtherController(DataHolder dataHolder, XamDbContext context, IHostApplicationLifetime applicationLifetime)
+    public HomeController(DataHolder dataHolder, XamDbContext context, IHostApplicationLifetime applicationLifetime)
     {
         _context = context;
         _dataHolder = dataHolder;

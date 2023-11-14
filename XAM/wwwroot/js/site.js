@@ -1,17 +1,25 @@
-﻿﻿const username = localStorage.getItem('currentUsername');
+﻿const username = localStorage.getItem('currentUsername');
 
 if (username === null || username === '' || username === undefined) {
+    if(location.pathname !== '/')
+        window.location.href = '/'
     showLoginScreen();
 } else {
     fetch(`/Home/CheckIfExpired?username=${username}`)
-        .then(response => {
-            if (response.ok) {
-                console.log(`Logged in as ${username}.`);
-                showMainPage();
-            } else {
-                console.log('Session expired.');
+        .then(response => response.json())
+        .then(data => {
+            if(data.errorCode === 'NoSession')
+            {
                 showLoginScreen();
             }
+            else
+            {
+                console.log(`Logged in as ${username}.`);
+                showMainPage();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
 }
 
@@ -25,8 +33,6 @@ document.getElementById('loginButton').addEventListener('click', () => {
     }
 });
 
-document.getElementById('logoutButton').addEventListener('click', logoutReset);
-
 function loginFunction(inputUsername) {
     fetch(`/Home/UsernameLogin?username=${inputUsername}`)
         .then(response => {
@@ -37,13 +43,12 @@ function loginFunction(inputUsername) {
             }
         })
         .then(() => {
-            console.log(`Logged in as ${inputUsername}.`);
             localStorage.setItem('currentUsername', inputUsername);
-            showMainPage();
+            resetToIndex();
         })
         .catch(error => {
             console.error('Error:', error);
-            showLoginScreen();
+            resetToIndex();
         });
 }
 
@@ -57,8 +62,14 @@ function showMainPage() {
     document.getElementById('mainPage').style.display = 'block';
 }
 
-function logoutReset() {
+document.getElementById('logoutButton').addEventListener('click', () => {
     localStorage.removeItem('currentUsername');
     showLoginScreen();
     document.getElementById('usernameField').value = '';
+    resetToIndex();
+});
+
+function resetToIndex()
+{
+    window.location.href = '/';
 }

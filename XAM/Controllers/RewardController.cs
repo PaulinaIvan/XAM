@@ -15,25 +15,7 @@ public class RewardController : Controller
 
     public async Task<IActionResult> Reward(HttpClient httpClient)
     {
-        DataHolder dataHolder = _context.GetDataHolder();
-        if (dataHolder.TimeUntilNextCocktail == null || dataHolder.TimeUntilNextCocktail < DateTime.Now)
-        {
-            if(dataHolder.CurrentCocktail != null)
-                dataHolder.Statistics.ResetTodaysStatistics(); // This should be in its own time tracing async method
-
-            dataHolder.TimeUntilNextCocktail = DateTime.Now.Date.AddDays(1);
-            
-            try
-            {
-                dataHolder.CurrentCocktail = await GetRandomCocktail(httpClient);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                dataHolder.CurrentCocktail = null;
-            }
-            _context.SaveToDatabase(dataHolder);
-        }
+        await CheckForCocktail(httpClient);
         return View();
     }
 
@@ -55,33 +37,26 @@ public class RewardController : Controller
         return Content(dataHolder.CurrentCocktail, "application/json");
     }
 
-    private async Task CocktailWaiter(HttpClient client)
+    private async Task CheckForCocktail(HttpClient httpClient)
     {
+        DataHolder dataHolder = _context.GetDataHolder();
         if (dataHolder.TimeUntilNextCocktail == null || dataHolder.TimeUntilNextCocktail < DateTime.Now)
         {
             if(dataHolder.CurrentCocktail != null)
-                dataHolder.Statistics.ResetTodaysStatistics();
+                dataHolder.Statistics.ResetTodaysStatistics(); // This should be in its own time tracing async method
 
             dataHolder.TimeUntilNextCocktail = DateTime.Now.Date.AddDays(1);
             
             try
             {
-                dataHolder.CurrentCocktail = await GetRandomCocktail(client);
-            }
-            catch (APIRequestExeption ex)
-            {
-                Console.WriteLine($"APIRequestExeption: {ex.Message}");
-                dataHolder.CurrentCocktail = null;
+                dataHolder.CurrentCocktail = await GetRandomCocktail(httpClient);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 dataHolder.CurrentCocktail = null;
             }
-        }
-        else
-        {
-            await Task.Delay(dataHolder.TimeUntilNextCocktail.Value.Subtract(DateTime.Now));
+            _context.SaveToDatabase(dataHolder);
         }
     }
 

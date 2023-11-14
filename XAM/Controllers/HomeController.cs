@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using XAM.Models;
+using static XAM.Models.HelperClass;
 
 namespace XAM.Controllers;
 
@@ -43,9 +44,12 @@ public class HomeController : Controller
     public IActionResult CheckIfExpired(string username)
     {
         if(_httpContextAccessor.HttpContext?.Session.GetString("CurrentUser") == username)
-            return Ok();
+            return Json(username);
         else
-            return BadRequest();
+        {
+            ErrorRecord errorResponse = CreateErrorResponse("NoSession", "No current user session exists.");
+            return Json(errorResponse);
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

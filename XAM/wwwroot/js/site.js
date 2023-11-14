@@ -1,4 +1,4 @@
-﻿const username = localStorage.getItem('currentUsername');
+﻿﻿const username = localStorage.getItem('currentUsername');
 
 if (username === null || username === '' || username === undefined) {
     showLoginScreen();

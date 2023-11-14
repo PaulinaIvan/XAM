@@ -55,6 +55,36 @@ public class RewardController : Controller
         return Content(dataHolder.CurrentCocktail, "application/json");
     }
 
+    private async Task CocktailWaiter(HttpClient client)
+    {
+        if (dataHolder.TimeUntilNextCocktail == null || dataHolder.TimeUntilNextCocktail < DateTime.Now)
+        {
+            if(dataHolder.CurrentCocktail != null)
+                dataHolder.Statistics.ResetTodaysStatistics();
+
+            dataHolder.TimeUntilNextCocktail = DateTime.Now.Date.AddDays(1);
+            
+            try
+            {
+                dataHolder.CurrentCocktail = await GetRandomCocktail(client);
+            }
+            catch (APIRequestExeption ex)
+            {
+                Console.WriteLine($"APIRequestExeption: {ex.Message}");
+                dataHolder.CurrentCocktail = null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                dataHolder.CurrentCocktail = null;
+            }
+        }
+        else
+        {
+            await Task.Delay(dataHolder.TimeUntilNextCocktail.Value.Subtract(DateTime.Now));
+        }
+    }
+
     private static async Task<string> GetRandomCocktail(HttpClient httpClient)
     {
         try
@@ -65,11 +95,11 @@ public class RewardController : Controller
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStringAsync();
             else
-                throw new Exception($"Request failed: {response.ReasonPhrase}");
+                throw new APIRequestExeption($"Request failed: {response.ReasonPhrase}");
         }
-        catch (Exception ex)
+        catch (APIRequestExeption ex)
         {
-            throw new Exception($"An error occurred while fetching data from the Cocktail API: {ex.StackTrace}");
+            throw new APIRequestExeption($"An error occurred while fetching data from the Cocktail API: {ex.StackTrace}");
         }
     }
 }

@@ -177,7 +177,7 @@ public class PreparationController : Controller
 
                     if (newDataHolder != null)
                     {
-                        List<Exam> examsNotOnFrontend = newDataHolder.Exams.Where(examA => !dataHolder.Exams.Any(examB => examA.Name == examB.Name)).ToList();
+                        List<Exam> examsNotOnFrontend = GetExamsNotOldDataHolder(dataHolder, newDataHolder);
                         dataHolder.Exams.AddRange(examsNotOnFrontend);
                         dataHolder.Statistics.LifetimeCreatedExamsCounter = newDataHolder.Statistics.LifetimeCreatedExamsCounter;
                         dataHolder.Statistics.LifetimeCreatedFlashcardsCounter = newDataHolder.Statistics.LifetimeCreatedFlashcardsCounter;
@@ -198,5 +198,10 @@ public class PreparationController : Controller
         {
             return BadRequest("No file was selected for upload.");
         }
+    }
+
+    public static List<Exam> GetExamsNotOldDataHolder(DataHolder oldDataHolder, DataHolder newDataHolder)
+    {
+        return newDataHolder.Exams.Where(examA => !oldDataHolder.Exams.Any(examB => examA.Name == examB.Name)).ToList();
     }
 }

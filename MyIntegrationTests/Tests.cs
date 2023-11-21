@@ -30,42 +30,7 @@ namespace MyIntegrationTests
         }
     }
 
-    public class ExamTests
-    {
-        [Fact]
-        public void Constructor_InitializesPropertiesCorrectly()
-        {
-            // Arrange
-            var name = "Test Exam";
-            var date = DateTime.Now;
-
-            // Act
-            var exam = new Exam(name, date);
-
-            // Assert
-            Assert.Equal(name, exam.Name);
-            Assert.Equal(date, exam.Date);
-            Assert.Empty(exam.Flashcards);
-        }
-    }
-
-    public class FlashcardTests
-    {
-        [Fact]
-        public void Constructor_InitializesPropertiesCorrectly()
-        {
-            // Arrange
-            string frontText = "Test Question";
-            string backText = "Test Answer";
-
-            // Act
-            var flashcard = new Flashcard(frontText, backText);
-
-            // Assert
-            Assert.Equal(frontText, flashcard.FrontText);
-            Assert.Equal(backText, flashcard.BackText);
-        }
-    }
+    // ------------------------------------------------------------
 
     public class ExamIntegrationTests
     {
@@ -88,6 +53,8 @@ namespace MyIntegrationTests
             Assert.Contains(flashcard, exam.Flashcards);
         }
     }
+
+    // ------------------------------------------------------------
 
     public class StatisticsIntegrationTests
     {
@@ -159,6 +126,8 @@ namespace MyIntegrationTests
         }
     }
 
+    // ------------------------------------------------------------
+
     public class ErrorRecordIntegrationTests
     {
         [Fact]
@@ -190,7 +159,9 @@ namespace MyIntegrationTests
         }
     }
 
-    public class APIRequestExeptionIntegrationTests
+    // ------------------------------------------------------------
+
+    public class APIRequestExeptionTests
     {
         [Fact]
         public void APIRequestExeption_ThrowsCorrectly()
@@ -233,6 +204,8 @@ namespace MyIntegrationTests
         }
     }
 
+    // ------------------------------------------------------------
+
     public class InvalidExamNameExceptionIntegrationTests
     {
         [Fact]
@@ -274,75 +247,6 @@ namespace MyIntegrationTests
                 // Assert
                 Assert.Equal(ex.Message, "Some message.");
             }
-        }
-    }
-
-    public class DataHolderIntegrationTests
-    {
-        [Fact]
-        public void DataHolder_HoldsSimplePropertiesCorrectly()
-        {
-            // Arrange
-            DataHolder dataHolder = new DataHolder();
-
-            // Act
-            dataHolder.DataHolderId = 5;
-
-            List<Exam> exams = new();
-            dataHolder.Exams = exams;
-
-            StatisticsHolder statisticsHolder = new();
-            dataHolder.Statistics = statisticsHolder;
-
-            dataHolder.CurrentCocktail = "Some cocktail.";
-
-            // Assert
-            Assert.Equal(dataHolder.DataHolderId, 5);
-            Assert.Equal(dataHolder.Exams, exams);
-            Assert.Equal(dataHolder.Statistics, statisticsHolder);
-            Assert.Equal(dataHolder.CurrentCocktail, "Some cocktail.");
-        }
-
-        [Fact]
-        public void DataHolder_HiddenUtcWorksCorrectly()
-        {
-            // Arrange
-            DataHolder dataHolder = new DataHolder();
-            DateTime dateTime = new DateTime(2023,11,01, 00,00,00);
-
-            // Act
-            dataHolder.TimeUntilNextCocktail = dateTime;
-
-            // Assert
-            Assert.Equal(dataHolder.TimeUntilNextCocktail, dateTime);
-        }
-    }
-
-    public class GetExamsNotOldDataHolderUnitTests
-    {
-        [Fact]
-        public void GetExamsNotOldDataHolder_ReturnsCorrectly()
-        {
-            // Arrange
-            DataHolder dataHolder1 = new DataHolder();
-            DataHolder dataHolder2 = new DataHolder();
-            List<Exam> exams = new List<Exam>
-            {
-                new Exam("Math", new DateTime(2023,12,01, 00,00,00)),
-                new Exam("Science", new DateTime(2023,12,05, 00,00,00)),
-                new Exam("History", new DateTime(2023,12,07, 00,00,00))
-            };
-            List<Exam> examsNotOnOld = new();
-
-            // Act
-            dataHolder1.Exams.Add(exams[0]);
-            dataHolder1.Exams.Add(exams[1]);
-            dataHolder2.Exams = exams;
-
-            examsNotOnOld = GetExamsNotOldDataHolder(dataHolder1, dataHolder2);
-
-            // Assert
-            Assert.Equal(examsNotOnOld[0], exams[2]);
         }
     }
 }

@@ -5,11 +5,11 @@ namespace XAM.Controllers;
 
 public class StatisticsController : Controller
 {
-    private readonly DataHolder _dataHolder;
+    private readonly XamDbContext _context;
 
-    public StatisticsController(DataHolder dataHolder)
+    public StatisticsController(XamDbContext context)
     {
-        _dataHolder = dataHolder;
+        _context = context;
     }
 
     public IActionResult Statistics()
@@ -19,6 +19,7 @@ public class StatisticsController : Controller
 
     public IActionResult FetchStatistics()
     {
+        DataHolder _dataHolder = _context.GetDataHolder();
         try
         {
             var result = new

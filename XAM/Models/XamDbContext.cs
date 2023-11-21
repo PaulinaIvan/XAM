@@ -4,7 +4,12 @@ namespace XAM.Models;
 
 public class XamDbContext : DbContext
 {
-    public XamDbContext(DbContextOptions<XamDbContext> options) : base(options) { }
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public XamDbContext(DbContextOptions<XamDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
 
     public DbSet<DataHolder> DataHoldersTable { get; set; }
     public DbSet<Exam> ExamsTable { get; set; }
@@ -30,31 +35,42 @@ public class XamDbContext : DbContext
             .HasForeignKey<StatisticsHolder>(statisticsHolder => statisticsHolder.StatisticsId);
     }
 
-    public bool SaveToDatabase(DataHolder newData)
+    public DataHolder GetDataHolder()
     {
-        try
-        {
-            DeleteAndReplaceRow(newData);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"An error occured when saving to the database: {ex.Message}");
-            return false;
-        }
+        string? username = _httpContextAccessor.HttpContext?.Session.GetString("CurrentUser");
 
-        return true;
+        DataHolder? foundDataHolder = DataHoldersTable
+            .Include(dataHolder => dataHolder.Exams)
+                .ThenInclude(exam => exam.Flashcards)
+            .Include(dataHolder => dataHolder.Statistics)
+            .FirstOrDefault(dataHolder => dataHolder.OwnerUsername == username);
+
+        if (foundDataHolder != null)
+        {
+            return foundDataHolder;
+        }
+        else
+        {
+            DataHolder newDataHolder = new() { OwnerUsername = username };
+            DataHoldersTable.Add(newDataHolder);
+            SaveChanges();
+
+            return newDataHolder;
+        }
     }
 
-    private void DeleteAndReplaceRow(DataHolder newData)
+    public void SaveToDatabase(DataHolder dataHolderToSave)
     {
-        var existingData = DataHoldersTable.FirstOrDefault();
-        if (existingData != null)
+        DataHolder? foundDataHolder = DataHoldersTable.FirstOrDefault(dataHolder => dataHolder.DataHolderId == dataHolderToSave.DataHolderId);
+
+        if (foundDataHolder != null)
         {
-            DataHoldersTable.Remove(existingData);
+            Entry(foundDataHolder).State = EntityState.Modified;
             SaveChanges();
         }
-
-        DataHoldersTable.Add(newData);
-        SaveChanges();
+        else
+        {
+            throw new Exception("Somehow the dataholder is gone.");
+        }
     }
 }

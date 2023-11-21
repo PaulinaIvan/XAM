@@ -6,11 +6,11 @@ namespace XAM.Controllers;
 
 public class TasksController : Controller
 {
-    private readonly DataHolder _dataHolder;
+    private readonly XamDbContext _context;
 
-    public TasksController(DataHolder dataHolder)
+    public TasksController(XamDbContext context)
     {
-        _dataHolder = dataHolder;
+        _context = context;
     }
 
     public IActionResult Tasks()
@@ -20,14 +20,16 @@ public class TasksController : Controller
 
     public IActionResult FetchExamNames()
     {
-        List<string> examNames = _dataHolder.Exams.Select(exam => exam.Name).ToList();
+        DataHolder dataHolder = _context.GetDataHolder();
+        List<string> examNames = dataHolder.Exams.Select(exam => exam.Name).ToList();
 
         return Json(examNames);
     }
 
     public IActionResult FetchFlashcardsOfExam(string examName)
     {
-        List<Flashcard>? flashcards = _dataHolder.Exams.Find(exam => exam.Name == examName)?.Flashcards;
+        DataHolder dataHolder = _context.GetDataHolder();
+        List<Flashcard>? flashcards = dataHolder.Exams.Find(exam => exam.Name == examName)?.Flashcards;
 
         if (flashcards == null || flashcards.Count == 0)
         {
@@ -43,7 +45,8 @@ public class TasksController : Controller
 
     public IActionResult SetChallengeHighscoreForExam(string examName, int score)
     {
-        Exam? theExam = _dataHolder.Exams.Find(exam => exam.Name == examName);
+        DataHolder dataHolder = _context.GetDataHolder();
+        Exam? theExam = dataHolder.Exams.Find(exam => exam.Name == examName);
 
         if (theExam == null)
         {
@@ -52,24 +55,26 @@ public class TasksController : Controller
         }
         else
         {
-            _dataHolder.Statistics.TodayChallengesTakenCounter++;
+            dataHolder.Statistics.TodayChallengesTakenCounter++;
+            string result;
             if (theExam.ChallengeHighscore < score)
             {
-                _dataHolder.Statistics.TodayHighscoresBeatenCounter++;
+                dataHolder.Statistics.TodayHighscoresBeatenCounter++;
                 int oldHighscore = theExam.ChallengeHighscore;
                 theExam.ChallengeHighscore = score;
-                var result = $@"New {examName} highscore!
+                result = $@"New {examName} highscore!
                                 Old highscore: {oldHighscore}
                                 New highscore: {score}";
-                return Json(result);
             }
             else
             {
-                var result = $@"No new highscore for {examName}...
+                result = $@"No new highscore for {examName}...
                                 Score: {score}
                                 Highscore: {theExam.ChallengeHighscore}";
-                return Json(result);
+                
             }
+            _context.SaveToDatabase(dataHolder);
+            return Json(result);
         }
     }
 

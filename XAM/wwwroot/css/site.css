@@ -46,3 +46,10 @@ input {
   font-weight: 500;
   font-size: 20px;
 }
+
+#loginScreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; 
+}

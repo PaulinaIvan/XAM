@@ -1,18 +1,17 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using XAM.Models;
+using static XAM.Models.HelperClass;
 
 namespace XAM.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly XamDbContext _context;
-    private readonly DataHolder _dataHolder;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public HomeController(DataHolder dataHolder, XamDbContext context)
+    public HomeController(IHttpContextAccessor httpContextAccessor)
     {
-        _context = context;
-        _dataHolder = dataHolder;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public IActionResult Index()
@@ -25,12 +24,32 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult SaveToDatabaseAction()
+    public IActionResult UsernameLogin(string username)
     {
-        if(_context.SaveToDatabase(_dataHolder))
-            return Json("Database save successful!");
+        if(username.IsValidExamName())
+        {
+            _httpContextAccessor.HttpContext?.Session.SetString("CurrentUser", username);
+            
+            if(_httpContextAccessor.HttpContext?.Session.GetString("CurrentUser") == username)
+                return Json(username);
+            else
+                return StatusCode(501, "Session storage doesn't work.");
+        }
         else
-            return StatusCode(500);
+        {
+            return StatusCode(500, "Invalid username.");
+        }
+    }
+
+    public IActionResult CheckIfExpired(string username)
+    {
+        if(_httpContextAccessor.HttpContext?.Session.GetString("CurrentUser") == username)
+            return Json(username);
+        else
+        {
+            ErrorRecord errorResponse = CreateErrorResponse("NoSession", "No current user session exists.");
+            return Json(errorResponse);
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

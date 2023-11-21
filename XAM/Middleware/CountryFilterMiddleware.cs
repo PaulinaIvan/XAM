@@ -1,5 +1,7 @@
 using System.Net;
 using MaxMind.GeoIP2;
+using MaxMind.GeoIP2.Exceptions;
+using MaxMind.GeoIP2.Responses;
 
 namespace XAM.Middleware;
 
@@ -22,13 +24,23 @@ public class CountryFilterMiddleware
 
         try
         {
-            if (ipAddress == null || IPAddress.IsLoopback(ipAddress) || ipAddress.Equals(IPAddress.IPv6Any) || ipAddress.Equals(IPAddress.IPv6None))
+            if (ipAddress == null || IPAddress.IsLoopback(ipAddress))
             {
                 await _next(context);
                 return;
             }
 
-            var response = _databaseReader.Country(ipAddress);
+            CountryResponse response;
+            try
+            {
+                response = _databaseReader.Country(ipAddress);
+            }
+            catch (AddressNotFoundException)
+            {
+                Console.WriteLine($"Address {ipAddress} not found in GeoIP2.");
+                await _next(context);
+                return;
+            }
 
             if (response.Country.IsoCode != _blockedCountryCode)
             {

@@ -21,7 +21,11 @@ public class Startup
         services.AddSingleton(options =>
         {
             var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "GeoLite2-Country.mmdb");
-            return new DatabaseReader(dbPath);
+            if(!File.Exists(dbPath))
+                throw new Exception("GeoLite2-Country.mmdb not found");
+            else
+                return new DatabaseReader(dbPath);
+            
         });
         services.AddSingleton<HttpClient>();
         services.AddDbContext<XamDbContext>(options =>

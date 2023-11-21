@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using XAM.Models;
+using XAM.Middleware;
+using MaxMind.GeoIP2;
 
 namespace XAM;
 
@@ -16,6 +18,11 @@ public class Startup
     {
         services.AddControllersWithViews();
         services.AddScoped<ErrorViewModel>();
+        services.AddSingleton(options =>
+        {
+            var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "GeoLite2-Country.mmdb");
+            return new DatabaseReader(dbPath);
+        });
         services.AddSingleton<HttpClient>();
         services.AddDbContext<XamDbContext>(options =>
         {
@@ -56,6 +63,7 @@ public class Startup
             app.UseHsts();
         }
 
+        app.UseCountryFilter("RU");
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();

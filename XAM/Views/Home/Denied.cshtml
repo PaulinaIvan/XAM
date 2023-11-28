@@ -1,0 +1,6 @@
+﻿@{
+    ViewData["Title"] = "Access denied";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Requests from <strong>@Context.Request.Query["blockedCountryCode"]</strong> are not allowed.</p>

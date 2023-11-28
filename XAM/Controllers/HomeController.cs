@@ -25,6 +25,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult Denied()
+    {
+        return View();
+    }
+
     public IActionResult SaveToDatabaseAction()
     {
         if(_context.SaveToDatabase(_dataHolder))

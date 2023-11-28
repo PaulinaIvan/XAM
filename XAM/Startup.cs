@@ -63,14 +63,14 @@ public class Startup
     {
         if (!env.IsDevelopment())
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler("/Shared/Error");
             app.UseHsts();
         }
 
-        app.UseCountryFilter("RU");
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        app.UseRouting();
         app.UseAuthorization();
+        app.UseCountryFilter("RU");
+        app.UseRouting();
     }
 }

@@ -42,15 +42,11 @@ public class CountryFilterMiddleware
                 return;
             }
 
-            if (response.Country.IsoCode != _blockedCountryCode)
+            if (response.Country.IsoCode == _blockedCountryCode && !context.Request.Path.StartsWithSegments("/Home/Denied"))
             {
-                await _next(context);
+                context.Response.Redirect($"/Home/Denied?blockedCountryCode={_blockedCountryCode}");
             }
-            else
-            {
-                context.Response.StatusCode = 403;
-                await context.Response.WriteAsync($"Access denied. Requests from {_blockedCountryCode} are not allowed.");
-            }
+            await _next(context);
         }
         catch (Exception ex)
         {

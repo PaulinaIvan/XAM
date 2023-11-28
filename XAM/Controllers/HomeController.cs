@@ -29,15 +29,27 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Denied()
-    {
-        return View();
-    }
-
     public IActionResult UsernameLogin(string username)
     {
-        if(_context.SaveToDatabase(_dataHolder))
-            return Json("Database save successful!");
+        if(username.IsValidExamName())
+        {
+            _httpContextAccessor.HttpContext?.Session.SetString("CurrentUser", username);
+            
+            if(_httpContextAccessor.HttpContext?.Session.GetString("CurrentUser") == username)
+                return Json(username);
+            else
+                return StatusCode(501, "Session storage doesn't work.");
+        }
+        else
+        {
+            return StatusCode(500, "Invalid username.");
+        }
+    }
+
+    public IActionResult CheckIfExpired(string username)
+    {
+        if(_httpContextAccessor.HttpContext?.Session.GetString("CurrentUser") == username)
+            return Json(username);
         else
         {
             ErrorRecord errorResponse = CreateErrorResponse("NoSession", "No current user session exists.");

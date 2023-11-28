@@ -40,7 +40,7 @@ public class Startup
         }, ServiceLifetime.Scoped);
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (!env.IsDevelopment())
         {
@@ -51,5 +51,8 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseAuthorization();
+        app.UseCountryFilter("RU");
+        app.UseRouting();
+        app.UseSession();
     }
 }

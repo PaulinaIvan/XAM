@@ -24,6 +24,15 @@ public class CountryFilterMiddleware
 
         try
         {
+            // Uncomment block to test
+            /*
+            if (!context.Request.Path.StartsWithSegments("/Home/Denied"))
+            {
+                context.Response.Redirect($"/Home/Denied?blockedCountryCode={_blockedCountryCode}");
+            }
+            await _next(context);
+            return;
+            */
             if (ipAddress == null || IPAddress.IsLoopback(ipAddress))
             {
                 await _next(context);

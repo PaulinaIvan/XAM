@@ -1,6 +1,10 @@
 ﻿const username = localStorage.getItem('currentUsername');
 
-if (username === null || username === '' || username === undefined) {
+if(location.pathname === '/Home/Denied')
+{
+    showDeniedScreen();
+}
+else if (username === null || username === '' || username === undefined) {
     if(location.pathname !== '/')
         window.location.href = '/'
     showLoginScreen();
@@ -55,11 +59,19 @@ function loginFunction(inputUsername) {
 function showLoginScreen() {
     document.getElementById('loginScreen').style.display = 'block';
     document.getElementById('mainPage').style.display = 'none';
+    document.getElementById('deniedScreen').style.display = 'none';
 }
 
 function showMainPage() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainPage').style.display = 'block';
+    document.getElementById('deniedScreen').style.display = 'none';
+}
+
+function showDeniedScreen() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainPage').style.display = 'none';
+    document.getElementById('deniedScreen').style.display = 'block';
 }
 
 document.getElementById('logoutButton').addEventListener('click', () => {

@@ -5,6 +5,7 @@ namespace XAM.Models;
 public class DataHolder
 {
     [Key] public int DataHolderId { get; set; }
+    public string? OwnerUsername { get; set; }
 
     public List<Exam> Exams { get; set; } = new();
 

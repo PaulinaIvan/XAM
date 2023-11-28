@@ -7,11 +7,11 @@ namespace XAM.Controllers;
 
 public class PreparationController : Controller
 {
-    private readonly DataHolder _dataHolder;
+    private readonly XamDbContext _context;
 
-    public PreparationController(DataHolder dataHolder)
+    public PreparationController(XamDbContext context)
     {
-        _dataHolder = dataHolder;
+        _context = context;
     }
 
     public IActionResult Preparation()
@@ -23,7 +23,8 @@ public class PreparationController : Controller
     readonly StringChecker checkForLetterNumbersAndSpaces = s => s.IsValidExamName(); // 5. Lambda expressions usage
     public IActionResult FetchExams()
     {
-        List<Exam> correctlyNamedExams = _dataHolder.Exams.Where(exam => checkForLetterNumbersAndSpaces(exam.Name)).ToList();
+        DataHolder dataHolder = _context.GetDataHolder();
+        List<Exam> correctlyNamedExams = dataHolder.Exams.Where(exam => checkForLetterNumbersAndSpaces(exam.Name)).ToList();
 
         // (Same thing as above, but with queries)
         // List<Exam> correctlyNamedExams = (from exam in _dataHolder.Exams where exam.Name.IsMadeOfLettersNumbersAndSpaces() select exam).ToList();
@@ -33,6 +34,7 @@ public class PreparationController : Controller
 
     public IActionResult CreateExam(string name, string date)
     {
+        DataHolder dataHolder = _context.GetDataHolder();
         if (!name.IsValidExamName())
         {
             string error = "Invalid exam name.";
@@ -57,24 +59,27 @@ public class PreparationController : Controller
         }
         Exam newExam = new(date: parsedDate, name: name);
 
-        _dataHolder.Exams.Add(newExam);
-        ++_dataHolder.Statistics.LifetimeCreatedExamsCounter;
-        ++_dataHolder.Statistics.TodayCreatedExamsCounter;
+        dataHolder.Exams.Add(newExam);
+        ++dataHolder.Statistics.LifetimeCreatedExamsCounter;
+        ++dataHolder.Statistics.TodayCreatedExamsCounter;
 
         var result = new
         {
             Name = newExam.Name,
             Date = newExam.Date.ToString("yyyy-MM-dd"),
         };
+        _context.SaveToDatabase(dataHolder);
         return Json(result);
     }
 
     public IActionResult DeleteExam(string examName)
     {
-        Exam? examToDelete = _dataHolder.Exams.Find(exam => exam.Name == examName);
+        DataHolder dataHolder = _context.GetDataHolder();
+        Exam? examToDelete = dataHolder.Exams.Find(exam => exam.Name == examName);
         if (examToDelete != null)
         {
-            _dataHolder.Exams.Remove(examToDelete);
+            dataHolder.Exams.Remove(examToDelete);
+            _context.SaveToDatabase(dataHolder);
             return Json("File uploaded and parsed successfully.");
         }
         else
@@ -85,9 +90,10 @@ public class PreparationController : Controller
 
     public IActionResult CreateFlashcard(string frontText, string backText, string examName)
     {
+        DataHolder dataHolder = _context.GetDataHolder();
         try
         {
-            Exam? exam = _dataHolder.Exams.Find(exam => exam.Name == examName);
+            Exam? exam = dataHolder.Exams.Find(exam => exam.Name == examName);
             if (exam == null)
             {
                 return BadRequest("Exam not found.");
@@ -96,8 +102,8 @@ public class PreparationController : Controller
             Flashcard flashcard = new(frontText, backText);
             exam.Flashcards.Add(flashcard);
 
-            ++_dataHolder.Statistics.LifetimeCreatedFlashcardsCounter;
-            ++_dataHolder.Statistics.TodayCreatedFlashcardsCounter;
+            ++dataHolder.Statistics.LifetimeCreatedFlashcardsCounter;
+            ++dataHolder.Statistics.TodayCreatedFlashcardsCounter;
 
             int index = exam.Flashcards.IndexOf(flashcard);
 
@@ -108,6 +114,7 @@ public class PreparationController : Controller
                 ExamName = examName,
                 Index = index
             };
+            _context.SaveToDatabase(dataHolder);
             return Json(result);
         }
         catch
@@ -120,9 +127,10 @@ public class PreparationController : Controller
     [HttpDelete]
     public IActionResult DeleteFlashcard(string examName, int flashcardIndex)
     {
+        DataHolder dataHolder = _context.GetDataHolder();
         try
         {
-            Exam? exam = _dataHolder.Exams.Find(exam => exam.Name == examName);
+            Exam? exam = dataHolder.Exams.Find(exam => exam.Name == examName);
             if (exam == null)
             {
                 return BadRequest("Exam not found.");
@@ -135,6 +143,7 @@ public class PreparationController : Controller
 
             exam.Flashcards.RemoveAt(flashcardIndex);
 
+            _context.SaveToDatabase(dataHolder);
             return Ok();
         }
         catch
@@ -147,7 +156,8 @@ public class PreparationController : Controller
     [HttpGet]
     public IActionResult DownloadAllData()
     {
-        var jsonContent = JsonSerializer.Serialize(_dataHolder);
+        DataHolder dataHolder = _context.GetDataHolder();
+        var jsonContent = JsonSerializer.Serialize(dataHolder);
 
         Response.Headers.Add("Content-Disposition", "attachment");
         return Content(jsonContent, "application/json");
@@ -155,6 +165,7 @@ public class PreparationController : Controller
 
     public IActionResult UploadDataFile(IFormFile file)
     {
+        DataHolder dataHolder = _context.GetDataHolder();
         if (file != null && file.Length > 0)
         {
             try
@@ -166,11 +177,12 @@ public class PreparationController : Controller
 
                     if (newDataHolder != null)
                     {
-                        List<Exam> examsNotOnFrontend = GetExamsNotOldDataHolder(_dataHolder, newDataHolder);
-                        _dataHolder.Exams.AddRange(examsNotOnFrontend);
-                        _dataHolder.Statistics.LifetimeCreatedExamsCounter = newDataHolder.Statistics.LifetimeCreatedExamsCounter;
-                        _dataHolder.Statistics.LifetimeCreatedFlashcardsCounter = newDataHolder.Statistics.LifetimeCreatedFlashcardsCounter;
+                        List<Exam> examsNotOnFrontend = GetExamsNotOldDataHolder(dataHolder, newDataHolder);
+                        dataHolder.Exams.AddRange(examsNotOnFrontend);
+                        dataHolder.Statistics.LifetimeCreatedExamsCounter = newDataHolder.Statistics.LifetimeCreatedExamsCounter;
+                        dataHolder.Statistics.LifetimeCreatedFlashcardsCounter = newDataHolder.Statistics.LifetimeCreatedFlashcardsCounter;
 
+                        _context.SaveToDatabase(dataHolder);
                         return Json(examsNotOnFrontend);
                     }
                 }

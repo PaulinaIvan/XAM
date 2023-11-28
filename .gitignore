@@ -2,5 +2,7 @@ XAM/obj/
 XAM/bin/
 MyIntegrationTests/obj/
 MyIntegrationTests/bin/
+MyIntegrationTests/CoverageReport/
+MyIntegrationTests/TestResults/
 XAM/appsettings.Development.json
 .vscode

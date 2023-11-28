@@ -16,7 +16,9 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddSession();
         services.AddControllersWithViews();
+        services.AddHttpContextAccessor();
         services.AddScoped<ErrorViewModel>();
         services.AddSingleton(options =>
         {
@@ -27,7 +29,7 @@ public class Startup
                 return new DatabaseReader(dbPath);
             
         });
-        services.AddSingleton<HttpClient>();
+        services.AddScoped<HttpClient>();
         services.AddDbContext<XamDbContext>(options =>
         {
             string? connectionString = Configuration.GetConnectionString("xamDatabaseConnection");
@@ -35,28 +37,7 @@ public class Startup
                 throw new Exception("xamDatabaseConnection not configured in appsettings.Development.json");
             else
                 options.UseNpgsql(connectionString);
-        });
-        services.AddSingleton(serviceProvider =>
-        {
-            using var scope = serviceProvider.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<XamDbContext>();
-
-            var dataHolder = dbContext.DataHoldersTable
-                .Include(dh => dh.Exams)
-                    .ThenInclude(exam => exam.Flashcards)
-                .Include(dh => dh.Statistics)
-                .FirstOrDefault();
-
-            if(dataHolder == null)
-            {
-                dataHolder = new DataHolder();
-
-                dbContext.DataHoldersTable.Add(dataHolder);
-                dbContext.SaveChanges();
-            }
-
-            return dataHolder;
-        });
+        }, ServiceLifetime.Scoped);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
@@ -70,7 +51,5 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseAuthorization();
-        app.UseCountryFilter("RU");
-        app.UseRouting();
     }
 }

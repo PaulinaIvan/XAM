@@ -1,18 +1,17 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using XAM.Models;
+using static XAM.Models.HelperClass;
 
 namespace XAM.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly XamDbContext _context;
-    private readonly DataHolder _dataHolder;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public HomeController(DataHolder dataHolder, XamDbContext context)
+    public HomeController(IHttpContextAccessor httpContextAccessor)
     {
-        _context = context;
-        _dataHolder = dataHolder;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public IActionResult Index()
@@ -30,12 +29,20 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult SaveToDatabaseAction()
+    public IActionResult Denied()
+    {
+        return View();
+    }
+
+    public IActionResult UsernameLogin(string username)
     {
         if(_context.SaveToDatabase(_dataHolder))
             return Json("Database save successful!");
         else
-            return StatusCode(500);
+        {
+            ErrorRecord errorResponse = CreateErrorResponse("NoSession", "No current user session exists.");
+            return Json(errorResponse);
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

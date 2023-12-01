@@ -53,3 +53,8 @@ input {
   align-items: center;
   height: 100vh; 
 }
+
+#deniedScreen {
+  font-size: 40px;
+  margin: 20px;
+}

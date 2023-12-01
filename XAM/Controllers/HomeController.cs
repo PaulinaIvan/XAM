@@ -24,6 +24,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult Denied()
+    {
+        return View();
+    }
+
     public IActionResult UsernameLogin(string username)
     {
         if(username.IsValidExamName())

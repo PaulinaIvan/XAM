@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using XAM.Models;
+using XAM.Middleware;
+using MaxMind.GeoIP2;
 
 namespace XAM;
 
@@ -18,6 +20,15 @@ public class Startup
         services.AddControllersWithViews();
         services.AddHttpContextAccessor();
         services.AddScoped<ErrorViewModel>();
+        services.AddSingleton(options =>
+        {
+            var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "GeoLite2-Country.mmdb");
+            if(!File.Exists(dbPath))
+                throw new Exception("GeoLite2-Country.mmdb not found");
+            else
+                return new DatabaseReader(dbPath);
+            
+        });
         services.AddScoped<HttpClient>();
         services.AddDbContext<XamDbContext>(options =>
         {
@@ -29,19 +40,19 @@ public class Startup
         }, ServiceLifetime.Scoped);
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (!env.IsDevelopment())
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler("/Shared/Error");
             app.UseHsts();
         }
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        app.UseRouting();
         app.UseAuthorization();
-
+        app.UseCountryFilter("RU");
+        app.UseRouting();
         app.UseSession();
     }
 }

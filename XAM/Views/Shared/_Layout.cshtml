@@ -15,6 +15,9 @@
 </head>
 
 <body>
+    <div id="deniedScreen" style="display: none;">
+        <p>Requests from <strong>@Context.Request.Query["blockedCountryCode"]</strong> are not allowed.</p>
+    </div>
     <div id="loginScreen" style="display: none;">
         <img src="~/Resources/plain_logo.png" alt="Logo" style="height: 50%;">
         <input id="usernameField" type="text" placeholder="Username">

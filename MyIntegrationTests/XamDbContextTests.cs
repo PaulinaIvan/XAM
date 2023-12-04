@@ -5,77 +5,80 @@ using System.Security.Claims;
 using Xunit;
 using XAM.Models;
 
-public class XamDbContextTests
+namespace MyIntegrationTests
 {
-    private readonly DbContextOptions<XamDbContext> _options;
-    private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
-
-    public XamDbContextTests()
+    public class XamDbContextTests
     {
-        _options = new DbContextOptionsBuilder<XamDbContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase") // Use in-memory database for testing
-            .Options;
+        private readonly DbContextOptions<XamDbContext> _options;
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
 
-        var mockHttpContext = new Mock<HttpContext>();
-        var mockClaimsPrincipal = new Mock<ClaimsPrincipal>();
-        var mockSession = new Mock<ISession>();
-
-        mockClaimsPrincipal.Setup(x => x.Identity.Name).Returns("testUser");
-        mockHttpContext.Setup(x => x.User).Returns(mockClaimsPrincipal.Object);
-        mockHttpContext.Setup(x => x.Session).Returns(mockSession.Object);
-
-        _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-        _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
-    }
-
-    [Fact]
-    public void GetDataHolder_ReturnsDataHolder()
-    {
-        // Arrange
-        var dataHolder = new DataHolder { OwnerUsername = "testUser" };
-
-        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+        public XamDbContextTests()
         {
-            context.DataHoldersTable.Add(dataHolder);
-            context.SaveChanges();
+            _options = new DbContextOptionsBuilder<XamDbContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase") // Use in-memory database for testing
+                .Options;
+
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockClaimsPrincipal = new Mock<ClaimsPrincipal>();
+            var mockSession = new Mock<ISession>();
+
+            mockClaimsPrincipal.Setup(x => x.Identity.Name).Returns("testUser");
+            mockHttpContext.Setup(x => x.User).Returns(mockClaimsPrincipal.Object);
+            mockHttpContext.Setup(x => x.Session).Returns(mockSession.Object);
+
+            _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
         }
 
-        // Act
-        DataHolder result;
-        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+        [Fact]
+        public void GetDataHolder_ReturnsDataHolder()
         {
-            result = context.DataHoldersTable.First();
+            // Arrange
+            var dataHolder = new DataHolder { OwnerUsername = "testUser" };
+
+            using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+            {
+                context.DataHoldersTable.Add(dataHolder);
+                context.SaveChanges();
+            }
+
+            // Act
+            DataHolder result;
+            using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+            {
+                result = context.DataHoldersTable.First();
+            }
+
+            // Assert
+            Assert.Equal("testUser", result.OwnerUsername);
         }
 
-        // Assert
-        Assert.Equal("testUser", result.OwnerUsername);
-    }
-
-    [Fact]
-    public void SaveToDatabase_UpdatesExistingDataHolder()
-    {
-        // Arrange
-        var dataHolder = new DataHolder { OwnerUsername = "testUser" };
-
-        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+        [Fact]
+        public void SaveToDatabase_UpdatesExistingDataHolder()
         {
-            context.DataHoldersTable.Add(dataHolder);
-            context.SaveChanges();
-        }
+            // Arrange
+            var dataHolder = new DataHolder { OwnerUsername = "testUser" };
 
-        // Act
-        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
-        {
-            var dataHolderToUpdate = context.DataHoldersTable.First();
-            dataHolderToUpdate.OwnerUsername = "updatedUser";
-            context.SaveToDatabase(dataHolderToUpdate);
-        }
+            using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+            {
+                context.DataHoldersTable.Add(dataHolder);
+                context.SaveChanges();
+            }
 
-        // Assert
-        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
-        {
-            var savedDataHolder = context.DataHoldersTable.First();
-            Assert.Equal("updatedUser", savedDataHolder.OwnerUsername);
+            // Act
+            using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+            {
+                var dataHolderToUpdate = context.DataHoldersTable.First();
+                dataHolderToUpdate.OwnerUsername = "updatedUser";
+                context.SaveToDatabase(dataHolderToUpdate);
+            }
+
+            // Assert
+            using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+            {
+                var savedDataHolder = context.DataHoldersTable.First();
+                Assert.Equal("updatedUser", savedDataHolder.OwnerUsername);
+            }
         }
     }
 }

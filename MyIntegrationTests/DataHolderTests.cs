@@ -2,7 +2,7 @@ using Xunit;
 using XAM.Models;
 using System;
 
-namespace DataHolderTests
+namespace MyIntegrationTests
 {
     public class DataHolderIntegrationTests
     {
@@ -24,10 +24,10 @@ namespace DataHolderTests
             dataHolder.CurrentCocktail = "Some cocktail.";
 
             // Assert
-            Assert.Equal(dataHolder.DataHolderId, 5);
+            Assert.Equal(5, dataHolder.DataHolderId);
             Assert.Equal(dataHolder.Exams, exams);
             Assert.Equal(dataHolder.Statistics, statisticsHolder);
-            Assert.Equal(dataHolder.CurrentCocktail, "Some cocktail.");
+            Assert.Equal("Some cocktail.", dataHolder.CurrentCocktail);
         }
 
         [Fact]

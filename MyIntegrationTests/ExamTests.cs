@@ -3,7 +3,7 @@ using XAM.Models;
 using System;
 using System.Collections.Generic;
 
-namespace ExamTests
+namespace MyIntegrationTests
 {
     public class ExamTests
     {

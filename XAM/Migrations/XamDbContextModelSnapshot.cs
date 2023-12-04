@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using XAM.Models;
+using System.Diagnostics.CodeAnalysis;
 
 #nullable disable
 
 namespace XAM.Migrations
 {
+    [ExcludeFromCodeCoverage]
     [DbContext(typeof(XamDbContext))]
     partial class XamDbContextModelSnapshot : ModelSnapshot
     {

@@ -9,26 +9,16 @@ using static XAM.Models.HelperClass;
 
 namespace MyIntegrationTests
 {
-    public class PreparationControllerTests : IDisposable
+    public class PreparationControllerTests
     {
-        // Db setup
-
-        private readonly XamDbContext _context;
-
-        public PreparationControllerTests()
+        private XamDbContext CreateDatabaseContext()
         {
-            var dbContextOptions = new DbContextOptionsBuilder<XamDbContext>()
-                .UseInMemoryDatabase(databaseName: "PreparationDatabase")
+            var options = new DbContextOptionsBuilder<XamDbContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
-
-            _context = new XamDbContext(dbContextOptions, Mock.Of<IHttpContextAccessor>());
-            _context.Database.EnsureCreated();
-        }
-
-        public void Dispose()
-        {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
+            var context = new XamDbContext(options, Mock.Of<IHttpContextAccessor>());
+            context.Database.EnsureCreated();
+            return context;
         }
 
         // Tests
@@ -37,7 +27,7 @@ namespace MyIntegrationTests
         public void Preparation_ReturnsViewResult()
         {
             // Arrange
-            var controller = new PreparationController(_context);
+            var controller = new PreparationController(CreateDatabaseContext());
 
             // Act
             var result = controller.Preparation();
@@ -51,7 +41,7 @@ namespace MyIntegrationTests
         public void CreateExam_ValidInput_ReturnsJsonResult(string name, string date)
         {
             // Arrange
-            var controller = new PreparationController(_context);
+            var controller = new PreparationController(CreateDatabaseContext());
 
             // Act
             var result = controller.CreateExam(name, date) as JsonResult;
@@ -62,7 +52,7 @@ namespace MyIntegrationTests
 
             var data = result.Value as dynamic;
             Assert.NotNull(data);
-            Assert.Equal($"{{ Name = {name}, Date = {DateTime.Parse(date).ToString("yyyy-MM-dd")} }}", data.ToString());
+            Assert.Equal($"{{ Name = {name}, Date = {DateTime.Parse(date).ToString("yyyy-MM-dd")} }}", data?.ToString());
         }
 
         [Theory]
@@ -70,7 +60,7 @@ namespace MyIntegrationTests
         public void CreateExam_InvalidName_ReturnsJsonError(string name, string date)
         {
             // Arrange
-            var controller = new PreparationController(_context);
+            var controller = new PreparationController(CreateDatabaseContext());
 
             // Act
             var result = controller.CreateExam(name, date) as JsonResult;
@@ -90,7 +80,7 @@ namespace MyIntegrationTests
         public void CreateExam_InvalidDate_ReturnsJsonError(string name, string date)
         {
             // Arrange
-            var controller = new PreparationController(_context);
+            var controller = new PreparationController(CreateDatabaseContext());
 
             // Act
             var result = controller.CreateExam(name, date) as JsonResult;
@@ -109,7 +99,7 @@ namespace MyIntegrationTests
         public void CreateFlashcard_WithInvalidExam_ReturnsBadRequest()
         {
             // Arrange
-            var controller = new PreparationController(_context);
+            var controller = new PreparationController(CreateDatabaseContext());
 
             // Act
             var result = controller.CreateFlashcard("FrontText", "BackText", "NonexistentExam") as BadRequestObjectResult;

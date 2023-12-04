@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using XAM.Models;
+using Castle.DynamicProxy;
+using XAM.Interceptors;
 
 namespace XAM.Controllers;
 
@@ -17,24 +19,15 @@ public class StatisticsController : Controller
         return View();
     }
 
-    public IActionResult FetchStatistics()
+    public IActionResult FetchStatistics(StatisticsCompiler statisticsCompiler, TimeTakenInterceptor timeTakenInterceptor, ProxyGenerator proxyGenerator)
     {
         DataHolder _dataHolder = _context.GetDataHolder();
         try
         {
-            var result = new
-            {
-                lifetimeExams = _dataHolder.Statistics.LifetimeCreatedExamsCounter,
-                lifetimeFlashcards = _dataHolder.Statistics.LifetimeCreatedFlashcardsCounter,
-                todayExams = _dataHolder.Statistics.TodayCreatedExamsCounter,
-                todayFlashcards = _dataHolder.Statistics.TodayCreatedFlashcardsCounter,
-                todayChallengeHighscores = _dataHolder.Statistics.TodayHighscoresBeatenCounter,
-                todayChallengeAttempts = _dataHolder.Statistics.TodayChallengesTakenCounter,
-                challengeHighscoresList = _dataHolder.Exams
-                    .Where(exam => exam.ChallengeHighscore > 0)
-                    .Select(exam => new { name = exam.Name, challengeHighscore = exam.ChallengeHighscore })
-                    .ToArray()
-            };
+            IStatisticsCompiler notInterceptedCompiler = statisticsCompiler;
+            IStatisticsCompiler interceptedCompiler = proxyGenerator.CreateInterfaceProxyWithTarget(notInterceptedCompiler, timeTakenInterceptor);
+
+            var result = interceptedCompiler.CompileStatistics(_dataHolder);
             return Json(result);
         }
         catch (Exception ex)

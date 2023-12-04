@@ -78,7 +78,7 @@ public class TasksController : Controller
         }
     }
 
-    static void Shuffle<T>(List<T> list) where T : class, IComparable<T> // 2. Create generic method, event or delegate; define at least 2 generic constraints
+    static void Shuffle<T>(List<T> list) where T : class, IComparable<T>
     {
         Random random = new();
 

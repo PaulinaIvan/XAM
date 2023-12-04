@@ -1,37 +1,81 @@
-using Xunit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using System.Security.Claims;
+using Xunit;
 using XAM.Models;
 
-namespace MyIntegrationTests
+public class XamDbContextTests
 {
-    public class XamDbContextTests
+    private readonly DbContextOptions<XamDbContext> _options;
+    private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
+
+    public XamDbContextTests()
     {
-        [Fact]
-        public void SaveToDatabase_SavesDataCorrectly()
+        _options = new DbContextOptionsBuilder<XamDbContext>()
+            .UseInMemoryDatabase(databaseName: "TestDatabase") // Use in-memory database for testing
+            .Options;
+
+        var mockHttpContext = new Mock<HttpContext>();
+        var mockClaimsPrincipal = new Mock<ClaimsPrincipal>();
+        var mockSession = new Mock<ISession>();
+
+        mockClaimsPrincipal.Setup(x => x.Identity.Name).Returns("testUser");
+        mockHttpContext.Setup(x => x.User).Returns(mockClaimsPrincipal.Object);
+        mockHttpContext.Setup(x => x.Session).Returns(mockSession.Object);
+
+        _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(mockHttpContext.Object);
+    }
+
+    [Fact]
+    public void GetDataHolder_ReturnsDataHolder()
+    {
+        // Arrange
+        var dataHolder = new DataHolder { OwnerUsername = "testUser" };
+
+        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
         {
-            // Arrange
-            var options = new DbContextOptionsBuilder<XamDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase") // Use in-memory database for testing
-                .Options;
+            context.DataHoldersTable.Add(dataHolder);
+            context.SaveChanges();
+        }
 
-            var dataHolder = new DataHolder(); // Create a new DataHolder object
+        // Act
+        DataHolder result;
+        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+        {
+            result = context.DataHoldersTable.First();
+        }
 
-            // Act
-            using (var context = new XamDbContext(options))
-            {
-                context.SaveToDatabase(dataHolder); // Save the DataHolder object to the database
-            }
+        // Assert
+        Assert.Equal("testUser", result.OwnerUsername);
+    }
 
-            // Assert
-            using (var context = new XamDbContext(options))
-            {
-                var savedDataHolder = context.DataHoldersTable.First();
-                Assert.Single(context.DataHoldersTable); // Check that one DataHolder object was saved to the database
-                Assert.Equal(dataHolder.CurrentCocktail, savedDataHolder.CurrentCocktail);
-                Assert.Equal(dataHolder.Exams, savedDataHolder.Exams);
-                Assert.Equal(dataHolder.TimeUntilNextCocktail, savedDataHolder.TimeUntilNextCocktail);
-                // Add more assertions for other properties if necessary
-            }
+    [Fact]
+    public void SaveToDatabase_UpdatesExistingDataHolder()
+    {
+        // Arrange
+        var dataHolder = new DataHolder { OwnerUsername = "testUser" };
+
+        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+        {
+            context.DataHoldersTable.Add(dataHolder);
+            context.SaveChanges();
+        }
+
+        // Act
+        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+        {
+            var dataHolderToUpdate = context.DataHoldersTable.First();
+            dataHolderToUpdate.OwnerUsername = "updatedUser";
+            context.SaveToDatabase(dataHolderToUpdate);
+        }
+
+        // Assert
+        using (var context = new XamDbContext(_options, _mockHttpContextAccessor.Object))
+        {
+            var savedDataHolder = context.DataHoldersTable.First();
+            Assert.Equal("updatedUser", savedDataHolder.OwnerUsername);
         }
     }
 }

@@ -36,6 +36,20 @@ namespace MyIntegrationTests
             Assert.IsType<ViewResult>(result);
         }
 
+        [Fact]
+        public void FetchExams_ReturnsJsonResult()
+        {
+            // Arrange
+            var controller = new PreparationController(CreateDatabaseContext());
+
+            // Act
+            var result = controller.FetchExams() as JsonResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<JsonResult>(result);
+        }
+
         [Theory]
         [InlineData("ValidExamName", "2023-12-04")]
         public void CreateExam_ValidInput_ReturnsJsonResult(string name, string date)
@@ -107,6 +121,22 @@ namespace MyIntegrationTests
             // Assert
             Assert.NotNull(result);
             Assert.Equal("Exam not found.", result.Value);
+        }
+
+        [Fact]
+        public void GetExamsNotOldDataHolder_ReturnsExamsNotInOldDataHolder()
+        {
+            // Arrange
+            var oldDataHolder = new DataHolder { Exams = new List<Exam> { new Exam("Math", DateTime.Now), new Exam("English", DateTime.Now) } };
+            var newDataHolder = new DataHolder { Exams = new List<Exam> { new Exam("Math", DateTime.Now), new Exam("Science", DateTime.Now) } };
+
+            // Act
+            var result = PreparationController.GetExamsNotOldDataHolder(oldDataHolder, newDataHolder);
+
+            // Assert
+            Assert.Collection(result,
+                exam => Assert.Equal("Science", exam.Name)
+            );
         }
     }
 }

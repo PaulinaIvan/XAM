@@ -4,6 +4,7 @@ using Moq;
 using Xunit;
 using XAM.Controllers;
 using XAM.Models;
+using static XAM.Models.HelperClass;
 
 namespace MyIntegrationTests
 {
@@ -63,6 +64,28 @@ namespace MyIntegrationTests
             Assert.NotNull(result);
             Assert.Equal(StatusCodes.Status500InternalServerError, result.StatusCode);
             Assert.Equal("Invalid username.", result.Value);
+        }
+
+        [Fact]
+        public void CheckIfExpired_NoUserSession_ReturnsJsonError()
+        {
+            // Arrange
+            var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+            var httpContextMock = new Mock<HttpContext>();
+            var sessionMock = new Mock<ISession>();
+
+            httpContextAccessorMock.SetupGet(x => x.HttpContext).Returns(httpContextMock.Object);
+            httpContextMock.SetupGet(x => x.Session).Returns(sessionMock.Object);
+
+            var controller = new HomeController(httpContextAccessorMock.Object);
+            const string username = "testUser";
+
+            // Act
+            var result = controller.CheckIfExpired("differentUser") as JsonResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<ErrorRecord>(result.Value);
         }
     }
 }

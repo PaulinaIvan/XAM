@@ -13,9 +13,9 @@ public static class HelperClass
                 throw new InvalidExamNameException("Null or empty exam name found in backend!");
 
             string pattern = @"^[\p{L}\p{N} ]+$"; // Letters and numbers from any language, and spaces pattern (at least one character)
-            return Regex.IsMatch(str, pattern); // 9. Regex usage
+            return Regex.IsMatch(str, pattern);
         }
-        catch (InvalidExamNameException ex) // 4. Create at least 1 exception type and throw it; meaningfully deal with it; (most of the exceptions are logged to a file or a server)
+        catch (InvalidExamNameException ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
             return false;

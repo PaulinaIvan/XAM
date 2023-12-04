@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using XAM.Models;
 using XAM.Middleware;
 using MaxMind.GeoIP2;
+using XAM.Interceptors;
+using Castle.DynamicProxy;
 
 namespace XAM;
 
@@ -38,6 +40,9 @@ public class Startup
             else
                 options.UseNpgsql(connectionString);
         }, ServiceLifetime.Scoped);
+        services.AddScoped<StatisticsCompiler>();
+        services.AddScoped<TimeTakenInterceptor>();
+        services.AddScoped<ProxyGenerator>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

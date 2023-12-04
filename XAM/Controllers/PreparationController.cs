@@ -19,8 +19,8 @@ public class PreparationController : Controller
         return View();
     }
 
-    delegate bool StringChecker(string s); // 3. Delegates usage
-    readonly StringChecker checkForLetterNumbersAndSpaces = s => s.IsValidExamName(); // 5. Lambda expressions usage
+    delegate bool StringChecker(string s);
+    readonly StringChecker checkForLetterNumbersAndSpaces = s => s.IsValidExamName();
     public IActionResult FetchExams()
     {
         DataHolder dataHolder = _context.GetDataHolder();

@@ -33,5 +33,18 @@ namespace MyIntegrationTests
             // Assert
             Assert.IsType<ViewResult>(result);
         }
+
+        [Fact]
+        public void Denied_ReturnsViewResult()
+        {
+            // Arrange
+            var controller = new HomeController(Mock.Of<IHttpContextAccessor>());
+
+            // Act
+            var result = controller.Denied();
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
     }
 }

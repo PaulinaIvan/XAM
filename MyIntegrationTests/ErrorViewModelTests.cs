@@ -1,7 +1,7 @@
 using Xunit;
 using XAM.Models;
 
-namespace ErrorViewModelTests
+namespace MyIntegrationTests
 {
     public class ErrorViewModelTests
     {

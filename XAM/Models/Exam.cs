@@ -5,8 +5,7 @@ namespace XAM.Models;
 public class Exam : IComparable<Exam>
 {
     [Key] public int ExamId { get; set; }
-    private string NameField;
-    public string Name { get { return NameField; } set { NameField = value; ValidNameCheck(value); } }
+    public string Name { get; set; }
     public DateTime Date
     {
         get => _date;
@@ -20,22 +19,9 @@ public class Exam : IComparable<Exam>
 
     public Exam(string name, DateTime date)
     {
-        NameField = name;
+        Name = name;
         Date = date;
         Flashcards = new List<Flashcard>(); // Initialize the list of flashcards
-    }
-
-    private static void ValidNameCheck(string newName)
-    {
-        try
-        {
-            if (!newName.IsValidExamName() || newName == "")
-                throw new Exception();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.StackTrace);
-        }
     }
 
     public int CompareTo(Exam? other)

@@ -73,12 +73,12 @@ namespace MyIntegrationTests
             statisticsHolder.TodayChallengesTakenCounter++;
 
             // Assert
-            Assert.Equal(statisticsHolder.LifetimeCreatedExamsCounter, 1);
-            Assert.Equal(statisticsHolder.LifetimeCreatedFlashcardsCounter, 1);
-            Assert.Equal(statisticsHolder.TodayCreatedExamsCounter, 1);
-            Assert.Equal(statisticsHolder.TodayCreatedFlashcardsCounter, 1);
-            Assert.Equal(statisticsHolder.TodayHighscoresBeatenCounter, 1);
-            Assert.Equal(statisticsHolder.TodayChallengesTakenCounter, 1);
+            Assert.Equal(1, statisticsHolder.LifetimeCreatedExamsCounter);
+            Assert.Equal(1, statisticsHolder.LifetimeCreatedFlashcardsCounter);
+            Assert.Equal(1, statisticsHolder.TodayCreatedExamsCounter);
+            Assert.Equal(1, statisticsHolder.TodayCreatedFlashcardsCounter);
+            Assert.Equal(1, statisticsHolder.TodayHighscoresBeatenCounter);
+            Assert.Equal(1, statisticsHolder.TodayChallengesTakenCounter);
         }
 
         [Fact]
@@ -117,12 +117,12 @@ namespace MyIntegrationTests
             statisticsHolder.ResetTodaysStatistics();
 
             // Assert
-            Assert.Equal(statisticsHolder.LifetimeCreatedExamsCounter, 1);
-            Assert.Equal(statisticsHolder.LifetimeCreatedFlashcardsCounter, 1);
-            Assert.Equal(statisticsHolder.TodayCreatedExamsCounter, 0);
-            Assert.Equal(statisticsHolder.TodayCreatedFlashcardsCounter, 0);
-            Assert.Equal(statisticsHolder.TodayHighscoresBeatenCounter, 0);
-            Assert.Equal(statisticsHolder.TodayChallengesTakenCounter, 0);
+            Assert.Equal(1, statisticsHolder.LifetimeCreatedExamsCounter);
+            Assert.Equal(1, statisticsHolder.LifetimeCreatedFlashcardsCounter);
+            Assert.Equal(0, statisticsHolder.TodayCreatedExamsCounter);
+            Assert.Equal(0, statisticsHolder.TodayCreatedFlashcardsCounter);
+            Assert.Equal(0, statisticsHolder.TodayHighscoresBeatenCounter);
+            Assert.Equal(0, statisticsHolder.TodayChallengesTakenCounter);
         }
     }
 
@@ -140,8 +140,8 @@ namespace MyIntegrationTests
             errorRecord = CreateErrorResponse("SomeErrorCode", "Some message.");
 
             // Assert
-            Assert.Equal(errorRecord.ErrorCode, "SomeErrorCode");
-            Assert.Equal(errorRecord.ErrorMessage, "Some message.");
+            Assert.Equal("SomeErrorCode", errorRecord.ErrorCode);
+            Assert.Equal("Some message.", errorRecord.ErrorMessage);
         }
 
         [Fact]
@@ -154,8 +154,8 @@ namespace MyIntegrationTests
             errorRecord = CreateErrorResponse("SomeErrorCode");
 
             // Assert
-            Assert.Equal(errorRecord.ErrorCode, "SomeErrorCode");
-            Assert.Equal(errorRecord.ErrorMessage, "Unknown error.");
+            Assert.Equal("SomeErrorCode", errorRecord.ErrorCode);
+            Assert.Equal("Unknown error.", errorRecord.ErrorMessage);
         }
     }
 
@@ -175,7 +175,7 @@ namespace MyIntegrationTests
                 // Act
                 throw apiRequestExeption;
             }
-            catch (APIRequestExeption ex)
+            catch (APIRequestExeption)
             {
                 catchChecker = true;
             }
@@ -186,6 +186,7 @@ namespace MyIntegrationTests
             }
         }
 
+        [Fact]
         public void APIRequestExeption_ThrowsWithMessageCorrectly()
         {
             // Arrange
@@ -199,7 +200,7 @@ namespace MyIntegrationTests
             catch (APIRequestExeption ex)
             {
                 // Assert
-                Assert.Equal(ex.Message, "Some message.");
+                Assert.Equal("Some message.", ex.Message);
             }
         }
     }
@@ -220,7 +221,7 @@ namespace MyIntegrationTests
                 // Act
                 throw invalidExamNameException;
             }
-            catch (InvalidExamNameException ex)
+            catch (InvalidExamNameException)
             {
                 catchChecker = true;
             }
@@ -245,7 +246,7 @@ namespace MyIntegrationTests
             catch (InvalidExamNameException ex)
             {
                 // Assert
-                Assert.Equal(ex.Message, "Some message.");
+                Assert.Equal("Some message.", ex.Message);
             }
         }
     }

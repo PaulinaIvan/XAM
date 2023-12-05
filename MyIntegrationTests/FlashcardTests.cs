@@ -1,7 +1,7 @@
 using Xunit;
 using XAM.Models;
 
-namespace FlashcardTests
+namespace MyIntegrationTests
 {
     public class FlashcardTests
     {

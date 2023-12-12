@@ -17,7 +17,7 @@ public class TimeTakenInterceptor : IInterceptor
         {
             stopwatch.Stop();
             
-            Console.WriteLine($"Method `{invocation.Method.Name}` took {stopwatch.ElapsedMilliseconds} ms to execute.");
+            Console.WriteLine($"Method `{invocation.Method.Name}` took {stopwatch.Elapsed.Microseconds} μs to execute.");
         }
     }
 }

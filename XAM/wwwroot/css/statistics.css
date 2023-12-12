@@ -1,3 +1,27 @@
 p {
     font-size: 20px;
 }
+
+#challengeHighscores {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#challengeHighscores th, #challengeHighscores td {
+    border: 1px solid #000000;
+    padding: 8px;
+    text-align: left;
+}
+
+#challengeHighscores th {
+    background-color: #14213d;
+    color: white;
+}
+
+#challengeHighscores tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#challengeHighscores tr:hover {
+    background-color: #e0e0e0;
+}

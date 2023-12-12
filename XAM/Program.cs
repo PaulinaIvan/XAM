@@ -1,17 +1,26 @@
-using XAM;
+using System.Diagnostics.CodeAnalysis;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace XAM;
 
-var startup = new Startup(builder.Configuration);
+[ExcludeFromCodeCoverage]
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-startup.ConfigureServices(builder.Services);
+        var startup = new Startup(builder.Configuration);
 
-var app = builder.Build();
+        startup.ConfigureServices(builder.Services);
 
-startup.Configure(app, app.Environment);
+        var app = builder.Build();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+        startup.Configure(app, app.Environment);
 
-app.Run();
+        app.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+
+        app.Run();
+    }
+}
